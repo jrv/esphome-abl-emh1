@@ -1,17 +1,15 @@
-#include "solax_x1_mini.h"
+#include "abl_emh1.h"
 #include "esphome/core/log.h"
 
 namespace esphome {
-namespace solax_x1_mini {
+namespace abl_emh1 {
 
-static const char *const TAG = "solax_x1_mini";
+static const char *const TAG = "abl_emh1";
 
 static const uint8_t FUNCTION_STATUS_REPORT = 0x82;
 static const uint8_t FUNCTION_DEVICE_INFO = 0x83;
 static const uint8_t FUNCTION_CONFIG_SETTINGS = 0x84;
 
-// SolaxPower Single Phase External Communication Protocol - X1 Series V1.2.pdf
-// SolaxPower Single Phase External Communication Protocol - X1 Series V1.8.pdf
 static const uint8_t MODES_SIZE = 7;
 static const std::string MODES[MODES_SIZE] = {
     "Wait",             // 0
@@ -23,7 +21,6 @@ static const std::string MODES[MODES_SIZE] = {
     "Self Test",        // 6
 };
 
-// SolaxPower Single Phase External Communication Protocol - X1 Series V1.8.pdf
 static const uint8_t ERRORS_SIZE = 32;
 static const char *const ERRORS[ERRORS_SIZE] = {
     "TZ Protect Fault",                          // 0000 0000 0000 0000 0000 0000 0000 0001 (1)
@@ -60,7 +57,7 @@ static const char *const ERRORS[ERRORS_SIZE] = {
     "Error (Bit 31)",                            // 1000 0000 0000 0000 0000 0000 0000 0000 (32)
 };
 
-void SolaxX1Mini::on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
+void ABLeMH1::on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
       this->decode_device_info_(data);
@@ -72,11 +69,11 @@ void SolaxX1Mini::on_emh1_modbus_data(const uint8_t &function, const std::vector
       this->decode_config_settings_(data);
       break;
     default:
-      ESP_LOGW(TAG, "Unhandled solax frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+      ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
   }
 }
 
-void SolaxX1Mini::decode_device_info_(const std::vector<uint8_t> &data) {
+void ABLeMH1::decode_device_info_(const std::vector<uint8_t> &data) {
   if (data.size() != 58) {
     ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
     return;
@@ -94,30 +91,30 @@ void SolaxX1Mini::decode_device_info_(const std::vector<uint8_t> &data) {
   this->no_response_count_ = 0;
 }
 
-void SolaxX1Mini::decode_config_settings_(const std::vector<uint8_t> &data) {
+void ABLeMH1::decode_config_settings_(const std::vector<uint8_t> &data) {
   if (data.size() != 68) {
     ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
     return;
   }
 
-  auto solax_get_16bit = [&](size_t i) -> uint16_t {
+  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
   ESP_LOGI(TAG, "Config settings frame received");
-  ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", solax_get_16bit(0) * 0.1f);
-  ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", solax_get_16bit(2));
-  ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", solax_get_16bit(4) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMaxProtect [15.16]: %f V", solax_get_16bit(6) * 0.1f);
-  ESP_LOGI(TAG, "  wFacMinProtect [17.18]: %f Hz", solax_get_16bit(8) * 0.01f);
-  ESP_LOGI(TAG, "  wFacMaxProtect [19.20]: %f Hz", solax_get_16bit(10) * 0.01f);
-  ESP_LOGI(TAG, "  wDciLimits [21.22]: %d mA", solax_get_16bit(12));
-  ESP_LOGI(TAG, "  wGrid10MinAvgProtect [23,24]: %f V", solax_get_16bit(14) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMinSlowProtect [25.26]: %f V", solax_get_16bit(16) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMaxSlowProtect [27.28]: %f V", solax_get_16bit(18) * 0.1f);
-  ESP_LOGI(TAG, "  wFacMinSlowProtect [29.30]: %f Hz", solax_get_16bit(20) * 0.01f);
-  ESP_LOGI(TAG, "  wFacMaxSlowProtect [31.32]: %f Hz", solax_get_16bit(22) * 0.01f);
-  ESP_LOGI(TAG, "  wSafety [33.34]: %d", solax_get_16bit(24));
+  ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
+  ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", emh1_get_16bit(2));
+  ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", emh1_get_16bit(4) * 0.1f);
+  ESP_LOGI(TAG, "  wVacMaxProtect [15.16]: %f V", emh1_get_16bit(6) * 0.1f);
+  ESP_LOGI(TAG, "  wFacMinProtect [17.18]: %f Hz", emh1_get_16bit(8) * 0.01f);
+  ESP_LOGI(TAG, "  wFacMaxProtect [19.20]: %f Hz", emh1_get_16bit(10) * 0.01f);
+  ESP_LOGI(TAG, "  wDciLimits [21.22]: %d mA", emh1_get_16bit(12));
+  ESP_LOGI(TAG, "  wGrid10MinAvgProtect [23,24]: %f V", emh1_get_16bit(14) * 0.1f);
+  ESP_LOGI(TAG, "  wVacMinSlowProtect [25.26]: %f V", emh1_get_16bit(16) * 0.1f);
+  ESP_LOGI(TAG, "  wVacMaxSlowProtect [27.28]: %f V", emh1_get_16bit(18) * 0.1f);
+  ESP_LOGI(TAG, "  wFacMinSlowProtect [29.30]: %f Hz", emh1_get_16bit(20) * 0.01f);
+  ESP_LOGI(TAG, "  wFacMaxSlowProtect [31.32]: %f Hz", emh1_get_16bit(22) * 0.01f);
+  ESP_LOGI(TAG, "  wSafety [33.34]: %d", emh1_get_16bit(24));
   // Supported safety values:
   //
   // 0: VDE0126
@@ -168,29 +165,29 @@ void SolaxX1Mini::decode_config_settings_(const std::vector<uint8_t> &data) {
   ESP_LOGI(TAG, "  wLowerLimit [38]: %d", data[29]);
   ESP_LOGI(TAG, "  wPowerLow [39]: %d", data[30]);
   ESP_LOGI(TAG, "  wPowerUp [40]: %d", data[31]);
-  ESP_LOGI(TAG, "  Qpower_set [41.42]: %d", solax_get_16bit(32));
-  ESP_LOGI(TAG, "  WFreqSetPoint [43.44]: %f Hz", solax_get_16bit(34) * 0.01f);
-  ESP_LOGI(TAG, "  WFreqDropRate [45.46]: %d", solax_get_16bit(36));
-  ESP_LOGI(TAG, "  QuVupRate [47.48]: %d", solax_get_16bit(38));
-  ESP_LOGI(TAG, "  QuVlowRate [49.50]: %d", solax_get_16bit(40));
-  ESP_LOGI(TAG, "  WPowerLimitsPercent [51.52]: %d", solax_get_16bit(42));
-  ESP_LOGI(TAG, "  WWgra [53.54]: %f %%", solax_get_16bit(44) * 0.01f);
-  ESP_LOGI(TAG, "  wWv2 [55.56]: %f V", solax_get_16bit(46) * 0.1f);
-  ESP_LOGI(TAG, "  wWv3 [57.58]: %f V", solax_get_16bit(48) * 0.1f);
-  ESP_LOGI(TAG, "  wWv4 [59.60]: %f V", solax_get_16bit(50) * 0.1f);
-  ESP_LOGI(TAG, "  wQurangeV1 [61.62]: %d %%", solax_get_16bit(52));
-  ESP_LOGI(TAG, "  wQurangeV4 [63.64]: %d %%", solax_get_16bit(54));
-  ESP_LOGI(TAG, "  BVoltPowerLimit [65.66]: %d", solax_get_16bit(56));
-  ESP_LOGI(TAG, "  WPowerManagerEnable [67.68]: %d", solax_get_16bit(58));
-  ESP_LOGI(TAG, "  WGlobalSearchMPPTStartFlag [69.70]: %d", solax_get_16bit(60));
-  ESP_LOGI(TAG, "  WFreqProtectRestrictive [71.72]: %d", solax_get_16bit(62));
-  ESP_LOGI(TAG, "  WQuDelayTimer [73.74]: %d S", solax_get_16bit(64));
-  ESP_LOGI(TAG, "  WFreqActivePowerDelayTimer [75.76]: %d ms", solax_get_16bit(66));
+  ESP_LOGI(TAG, "  Qpower_set [41.42]: %d", emh1_get_16bit(32));
+  ESP_LOGI(TAG, "  WFreqSetPoint [43.44]: %f Hz", emh1_get_16bit(34) * 0.01f);
+  ESP_LOGI(TAG, "  WFreqDropRate [45.46]: %d", emh1_get_16bit(36));
+  ESP_LOGI(TAG, "  QuVupRate [47.48]: %d", emh1_get_16bit(38));
+  ESP_LOGI(TAG, "  QuVlowRate [49.50]: %d", emh1_get_16bit(40));
+  ESP_LOGI(TAG, "  WPowerLimitsPercent [51.52]: %d", emh1_get_16bit(42));
+  ESP_LOGI(TAG, "  WWgra [53.54]: %f %%", emh1_get_16bit(44) * 0.01f);
+  ESP_LOGI(TAG, "  wWv2 [55.56]: %f V", emh1_get_16bit(46) * 0.1f);
+  ESP_LOGI(TAG, "  wWv3 [57.58]: %f V", emh1_get_16bit(48) * 0.1f);
+  ESP_LOGI(TAG, "  wWv4 [59.60]: %f V", emh1_get_16bit(50) * 0.1f);
+  ESP_LOGI(TAG, "  wQurangeV1 [61.62]: %d %%", emh1_get_16bit(52));
+  ESP_LOGI(TAG, "  wQurangeV4 [63.64]: %d %%", emh1_get_16bit(54));
+  ESP_LOGI(TAG, "  BVoltPowerLimit [65.66]: %d", emh1_get_16bit(56));
+  ESP_LOGI(TAG, "  WPowerManagerEnable [67.68]: %d", emh1_get_16bit(58));
+  ESP_LOGI(TAG, "  WGlobalSearchMPPTStartFlag [69.70]: %d", emh1_get_16bit(60));
+  ESP_LOGI(TAG, "  WFreqProtectRestrictive [71.72]: %d", emh1_get_16bit(62));
+  ESP_LOGI(TAG, "  WQuDelayTimer [73.74]: %d S", emh1_get_16bit(64));
+  ESP_LOGI(TAG, "  WFreqActivePowerDelayTimer [75.76]: %d ms", emh1_get_16bit(66));
 
   this->no_response_count_ = 0;
 }
 
-void SolaxX1Mini::decode_status_report_(const std::vector<uint8_t> &data) {
+void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
   if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
     // Solax X1 mini status report (data_len 0x34: 52 bytes):
     // AA.55.00.0A.01.00.11.82.34.00.1A.00.02.00.00.00.00.00.00.00.00.00.00.09.21.13.87.00.00.FF.FF.
@@ -211,66 +208,66 @@ void SolaxX1Mini::decode_status_report_(const std::vector<uint8_t> &data) {
     return;
   }
 
-  auto solax_get_16bit = [&](size_t i) -> uint16_t {
+  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
-  auto solax_get_32bit = [&](size_t i) -> uint32_t {
+  auto emh1_get_32bit = [&](size_t i) -> uint32_t {
     return uint32_t((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
   };
-  auto solax_get_error_bitmask = [&](size_t i) -> uint32_t {
+  auto emh1_get_error_bitmask = [&](size_t i) -> uint32_t {
     return uint32_t((data[i + 3] << 24) | (data[i + 2] << 16) | (data[i + 1] << 8) | data[i]);
   };
 
   ESP_LOGI(TAG, "Status frame received");
 
-  this->publish_state_(this->temperature_sensor_, (int16_t) solax_get_16bit(0));
-  this->publish_state_(this->energy_today_sensor_, solax_get_16bit(2) * 0.1f);
-  this->publish_state_(this->dc1_voltage_sensor_, solax_get_16bit(4) * 0.1f);
-  this->publish_state_(this->dc2_voltage_sensor_, solax_get_16bit(6) * 0.1f);
-  this->publish_state_(this->dc1_current_sensor_, solax_get_16bit(8) * 0.1f);
-  this->publish_state_(this->dc2_current_sensor_, solax_get_16bit(10) * 0.1f);
-  this->publish_state_(this->ac_current_sensor_, solax_get_16bit(12) * 0.1f);
-  this->publish_state_(this->ac_voltage_sensor_, solax_get_16bit(14) * 0.1f);
-  this->publish_state_(this->ac_frequency_sensor_, solax_get_16bit(16) * 0.01f);
-  this->publish_state_(this->ac_power_sensor_, solax_get_16bit(18));
+  this->publish_state_(this->temperature_sensor_, (int16_t) emh1_get_16bit(0));
+  this->publish_state_(this->energy_today_sensor_, emh1_get_16bit(2) * 0.1f);
+  this->publish_state_(this->dc1_voltage_sensor_, emh1_get_16bit(4) * 0.1f);
+  this->publish_state_(this->dc2_voltage_sensor_, emh1_get_16bit(6) * 0.1f);
+  this->publish_state_(this->dc1_current_sensor_, emh1_get_16bit(8) * 0.1f);
+  this->publish_state_(this->dc2_current_sensor_, emh1_get_16bit(10) * 0.1f);
+  this->publish_state_(this->ac_current_sensor_, emh1_get_16bit(12) * 0.1f);
+  this->publish_state_(this->ac_voltage_sensor_, emh1_get_16bit(14) * 0.1f);
+  this->publish_state_(this->ac_frequency_sensor_, emh1_get_16bit(16) * 0.01f);
+  this->publish_state_(this->ac_power_sensor_, emh1_get_16bit(18));
 
   // register 20 is not used
 
-  uint32_t raw_energy_total = solax_get_32bit(22);
+  uint32_t raw_energy_total = emh1_get_32bit(22);
   // The inverter publishes a zero once per day on boot-up. This confuses the energy dashboard.
   if (raw_energy_total > 0) {
     this->publish_state_(this->energy_total_sensor_, raw_energy_total * 0.1f);
   }
 
-  uint32_t raw_runtime_total = solax_get_32bit(26);
+  uint32_t raw_runtime_total = emh1_get_32bit(26);
   if (raw_runtime_total > 0) {
     this->publish_state_(this->runtime_total_sensor_, (float) raw_runtime_total);
   }
 
-  uint8_t mode = (uint8_t) solax_get_16bit(30);
+  uint8_t mode = (uint8_t) emh1_get_16bit(30);
   this->publish_state_(this->mode_sensor_, mode);
   this->publish_state_(this->mode_name_text_sensor_, (mode < MODES_SIZE) ? MODES[mode] : "Unknown");
 
-  this->publish_state_(this->grid_voltage_fault_sensor_, solax_get_16bit(32) * 0.1f);
-  this->publish_state_(this->grid_frequency_fault_sensor_, solax_get_16bit(34) * 0.01f);
-  this->publish_state_(this->dc_injection_fault_sensor_, solax_get_16bit(36) * 0.001f);
-  this->publish_state_(this->temperature_fault_sensor_, (float) solax_get_16bit(38));
-  this->publish_state_(this->pv1_voltage_fault_sensor_, solax_get_16bit(40) * 0.1f);
-  this->publish_state_(this->pv2_voltage_fault_sensor_, solax_get_16bit(42) * 0.1f);
-  this->publish_state_(this->gfc_fault_sensor_, solax_get_16bit(44) * 0.001f);
+  this->publish_state_(this->grid_voltage_fault_sensor_, emh1_get_16bit(32) * 0.1f);
+  this->publish_state_(this->grid_frequency_fault_sensor_, emh1_get_16bit(34) * 0.01f);
+  this->publish_state_(this->dc_injection_fault_sensor_, emh1_get_16bit(36) * 0.001f);
+  this->publish_state_(this->temperature_fault_sensor_, (float) emh1_get_16bit(38));
+  this->publish_state_(this->pv1_voltage_fault_sensor_, emh1_get_16bit(40) * 0.1f);
+  this->publish_state_(this->pv2_voltage_fault_sensor_, emh1_get_16bit(42) * 0.1f);
+  this->publish_state_(this->gfc_fault_sensor_, emh1_get_16bit(44) * 0.001f);
 
-  uint32_t error_bits = solax_get_error_bitmask(46);
+  uint32_t error_bits = emh1_get_error_bitmask(46);
   this->publish_state_(this->error_bits_sensor_, error_bits);
   this->publish_state_(this->errors_text_sensor_, this->error_bits_to_string_(error_bits));
 
   if (data.size() > 50) {
-    ESP_LOGD(TAG, "  CT Pgrid: %d W", solax_get_16bit(50));
+    ESP_LOGD(TAG, "  CT Pgrid: %d W", emh1_get_16bit(50));
   }
 
   this->no_response_count_ = 0;
 }
 
-void SolaxX1Mini::publish_device_offline_() {
+void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->mode_sensor_, -1);
   this->publish_state_(this->mode_name_text_sensor_, "Offline");
 
@@ -292,7 +289,7 @@ void SolaxX1Mini::publish_device_offline_() {
   this->publish_state_(this->gfc_fault_sensor_, NAN);
 }
 
-void SolaxX1Mini::update() {
+void ABLeMH1::update() {
   if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
     this->publish_device_offline_();
     ESP_LOGD(TAG, "The device is or was offline. Broadcasting discovery for address configuration...");
@@ -307,22 +304,22 @@ void SolaxX1Mini::update() {
   }
 }
 
-void SolaxX1Mini::publish_state_(sensor::Sensor *sensor, float value) {
+void ABLeMH1::publish_state_(sensor::Sensor *sensor, float value) {
   if (sensor == nullptr)
     return;
 
   sensor->publish_state(value);
 }
 
-void SolaxX1Mini::publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state) {
+void ABLeMH1::publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state) {
   if (text_sensor == nullptr)
     return;
 
   text_sensor->publish_state(state);
 }
 
-void SolaxX1Mini::dump_config() {
-  ESP_LOGCONFIG(TAG, "SolaxX1Mini:");
+void ABLeMH1::dump_config() {
+  ESP_LOGCONFIG(TAG, "ABLeMH1:");
   ESP_LOGCONFIG(TAG, "  Address: 0x%02X", this->address_);
   LOG_SENSOR("", "Temperature", this->temperature_sensor_);
   LOG_SENSOR("", "Energy today", this->energy_today_sensor_);
@@ -349,7 +346,7 @@ void SolaxX1Mini::dump_config() {
   LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
 }
 
-std::string SolaxX1Mini::error_bits_to_string_(const uint32_t mask) {
+std::string ABLeMH1::error_bits_to_string_(const uint32_t mask) {
   std::string values = "";
   if (mask) {
     for (int i = 0; i < ERRORS_SIZE; i++) {
@@ -365,5 +362,5 @@ std::string SolaxX1Mini::error_bits_to_string_(const uint32_t mask) {
   return values;
 }
 
-}  // namespace solax_x1_mini
+}  // namespace abl_emh1
 }  // namespace esphome

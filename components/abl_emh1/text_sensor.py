@@ -3,9 +3,9 @@ from esphome.components import text_sensor
 import esphome.config_validation as cv
 from esphome.const import CONF_ICON, CONF_ID
 
-from . import CONF_SOLAX_X1_MINI_ID, SolaxX1Mini
+from . import CONF_ABL_EMH1_ID, ABLeMH1
 
-DEPENDENCIES = ["solax_x1_mini"]
+DEPENDENCIES = ["abl_emh1"]
 
 CONF_MODE_NAME = "mode_name"
 CONF_ERRORS = "errors"
@@ -15,7 +15,7 @@ ICON_ERRORS = "mdi:alert-circle-outline"
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(CONF_SOLAX_X1_MINI_ID): cv.use_id(SolaxX1Mini),
+        cv.GenerateID(CONF_ABL_EMH1_ID): cv.use_id(ABLeMH1),
         cv.Optional(CONF_MODE_NAME): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
@@ -33,7 +33,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    hub = await cg.get_variable(config[CONF_SOLAX_X1_MINI_ID])
+    hub = await cg.get_variable(config[CONF_ABL_EMH1_ID])
     for key in [CONF_MODE_NAME, CONF_ERRORS]:
         if key in config:
             conf = config[key]

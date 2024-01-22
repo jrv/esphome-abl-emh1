@@ -6,11 +6,11 @@
 #include "esphome/components/emh1_modbus/emh1_modbus.h"
 
 namespace esphome {
-namespace solax_x1_mini {
+namespace abl_emh1 {
 
 static const uint8_t REDISCOVERY_THRESHOLD = 5;
 
-class SolaxX1Mini : public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
+class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
  public:
   void set_energy_today_sensor(sensor::Sensor *energy_today_sensor) { energy_today_sensor_ = energy_today_sensor; }
   void set_energy_total_sensor(sensor::Sensor *energy_total_sensor) { energy_total_sensor_ = energy_total_sensor; }
@@ -90,5 +90,5 @@ class SolaxX1Mini : public PollingComponent, public emh1_modbus::eMH1ModbusDevic
   std::string error_bits_to_string_(uint32_t bitmask);
 };
 
-}  // namespace solax_x1_mini
+}  // namespace abl_emh1
 }  // namespace esphome
