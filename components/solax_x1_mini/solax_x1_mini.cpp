@@ -60,7 +60,7 @@ static const char *const ERRORS[ERRORS_SIZE] = {
     "Error (Bit 31)",                            // 1000 0000 0000 0000 0000 0000 0000 0000 (32)
 };
 
-void SolaxX1Mini::on_solax_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
+void SolaxX1Mini::on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
       this->decode_device_info_(data);

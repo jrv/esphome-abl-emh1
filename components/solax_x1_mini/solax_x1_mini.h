@@ -3,14 +3,14 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
-#include "esphome/components/solax_modbus/solax_modbus.h"
+#include "esphome/components/emh1_modbus/emh1_modbus.h"
 
 namespace esphome {
 namespace solax_x1_mini {
 
 static const uint8_t REDISCOVERY_THRESHOLD = 5;
 
-class SolaxX1Mini : public PollingComponent, public solax_modbus::SolaxModbusDevice {
+class SolaxX1Mini : public PollingComponent, public emh1_modbus::Emh1ModbusDevice {
  public:
   void set_energy_today_sensor(sensor::Sensor *energy_today_sensor) { energy_today_sensor_ = energy_today_sensor; }
   void set_energy_total_sensor(sensor::Sensor *energy_total_sensor) { energy_total_sensor_ = energy_total_sensor; }
@@ -51,7 +51,7 @@ class SolaxX1Mini : public PollingComponent, public solax_modbus::SolaxModbusDev
   uint8_t get_no_response_count() { return no_response_count_; }
 
   void update() override;
-  void on_solax_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) override;
+  void on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) override;
   void dump_config() override;
 
  protected:
