@@ -222,7 +222,7 @@ void emh1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
-void emh1Modbus::send(emh1MessageT *tx_message) {
+void Emh1Modbus::send(emh1MessageT *tx_message) {
   uint8_t msg_len;
 
   tx_message->Header[0] = 0xAA;
