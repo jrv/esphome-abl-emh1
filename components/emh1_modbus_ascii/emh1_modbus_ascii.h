@@ -12,6 +12,11 @@ class Emh1Modbus : public uart::UARTDevice, public Component {
 		
 		void setup() override;
 		void loop() override;
+    void set_enable_pin(GPIOPin *enable_pin) { this->enable_pin_ = enable_pin; }
+
+	protected:
+	  GPIOPin *enable_pin_{nullptr};
+}
 
 }  // namespace emh1_modbus_ascii
 }  // namespace esphome
