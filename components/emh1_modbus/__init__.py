@@ -14,13 +14,13 @@ CONF_EMH1_MODBUS_ID = "emh1_modbus_id"
 CONF_SERIAL_NUMBER = "serial_number"
 
 emh1_modbus_ns = cg.esphome_ns.namespace("emh1_modbus")
-Emh1Modbus = emh1_modbus_ns.class_("eMH1Modbus", cg.Component, uart.UARTDevice)
-Emh1ModbusDevice = emh1_modbus_ns.class_("eMH1ModbusDevice")
+eMH1Modbus = emh1_modbus_ns.class_("eMH1Modbus", cg.Component, uart.UARTDevice)
+eMH1ModbusDevice = emh1_modbus_ns.class_("eMH1ModbusDevice")
 
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(Emh1Modbus),
+            cv.GenerateID(): cv.declare_id(eMH1Modbus),
             cv.Optional(CONF_FLOW_CONTROL_PIN): pins.gpio_output_pin_schema,
         }
     )
@@ -68,7 +68,7 @@ async def to_code(config):
 
 def emh1_modbus_device_schema(default_address, default_serial):
     schema = {
-        cv.GenerateID(CONF_EMH1_MODBUS_ID): cv.use_id(Emh1Modbus),
+        cv.GenerateID(CONF_EMH1_MODBUS_ID): cv.use_id(eMH1Modbus),
     }
     if default_address is None:
         schema[cv.Required(CONF_ADDRESS)] = cv.hex_uint8_t
