@@ -1,32 +1,32 @@
-#include "solax_modbus.h"
+#include "emh1_modbus.h"
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 
 #define BROADCAST_ADDRESS 0xFF
 
 namespace esphome {
-namespace solax_modbus {
+namespace emh1_modbus {
 
-static const char *const TAG = "solax_modbus";
+static const char *const TAG = "emh1_modbus";
 
-void SolaxModbus::setup() {
+void emh1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
     this->flow_control_pin_->setup();
   }
 }
 
-void SolaxModbus::loop() {
+void emh1Modbus::loop() {
   const uint32_t now = millis();
-  if (now - this->last_solax_modbus_byte_ > 50) {
+  if (now - this->last_emh1_modbus_byte_ > 50) {
     this->rx_buffer_.clear();
-    this->last_solax_modbus_byte_ = now;
+    this->last_emh1_modbus_byte_ = now;
   }
 
   while (this->available()) {
     uint8_t byte;
     this->read_byte(&byte);
-    if (this->parse_solax_modbus_byte_(byte)) {
-      this->last_solax_modbus_byte_ = now;
+    if (this->parse_emh1_modbus_byte_(byte)) {
+      this->last_emh1_modbus_byte_ = now;
     } else {
       this->rx_buffer_.clear();
     }
@@ -52,7 +52,7 @@ uint16_t chksum(const uint8_t data[], const uint8_t len) {
   return checksum;
 }
 
-bool SolaxModbus::parse_solax_modbus_byte_(uint8_t byte) {
+bool emh1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const uint8_t *frame = &this->rx_buffer_[0];
@@ -68,7 +68,7 @@ bool SolaxModbus::parse_solax_modbus_byte_(uint8_t byte) {
   if (at == 2)
     return true;
 
-  // Byte 3: solax device address
+  // Byte 3: emh1 device address
   if (at == 3)
     return true;
   uint8_t address = frame[3];
@@ -121,7 +121,7 @@ bool SolaxModbus::parse_solax_modbus_byte_(uint8_t byte) {
   for (auto *device : this->devices_) {
     if (device->address_ == address) {
       if (frame[6] == 0x11) {
-        device->on_solax_modbus_data(frame[7], data);
+        device->on_emh1_modbus_data(frame[7], data);
       } else {
         ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
                  format_hex_pretty(frame, at + 1).c_str());
@@ -131,27 +131,27 @@ bool SolaxModbus::parse_solax_modbus_byte_(uint8_t byte) {
   }
 
   if (!found) {
-    ESP_LOGW(TAG, "Got solax frame from unknown device address 0x%02X!", address);
+    ESP_LOGW(TAG, "Got emh1 frame from unknown device address 0x%02X!", address);
   }
 
   // return false to reset buffer
   return false;
 }
 
-void SolaxModbus::dump_config() {
-  ESP_LOGCONFIG(TAG, "SolaxModbus:");
+void emh1Modbus::dump_config() {
+  ESP_LOGCONFIG(TAG, "emh1Modbus:");
   LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
 
   this->check_uart_settings(9600);
 }
 
-float SolaxModbus::get_setup_priority() const {
+float emh1Modbus::get_setup_priority() const {
   // After UART bus
   return setup_priority::BUS - 1.0f;
 }
 
-void SolaxModbus::query_status_report(uint8_t address) {
-  static SolaxMessageT tx_message;
+void emh1Modbus::query_status_report(uint8_t address) {
+  static emh1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -164,8 +164,8 @@ void SolaxModbus::query_status_report(uint8_t address) {
   this->send(&tx_message);
 }
 
-void SolaxModbus::query_device_info(uint8_t address) {
-  static SolaxMessageT tx_message;
+void emh1Modbus::query_device_info(uint8_t address) {
+  static emh1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -178,8 +178,8 @@ void SolaxModbus::query_device_info(uint8_t address) {
   this->send(&tx_message);
 }
 
-void SolaxModbus::query_config_settings(uint8_t address) {
-  static SolaxMessageT tx_message;
+void emh1Modbus::query_config_settings(uint8_t address) {
+  static emh1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -192,8 +192,8 @@ void SolaxModbus::query_config_settings(uint8_t address) {
   this->send(&tx_message);
 }
 
-void SolaxModbus::register_address(uint8_t serial_number[14], uint8_t address) {
-  static SolaxMessageT tx_message;
+void emh1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
+  static emh1MessageT tx_message;
 
   tx_message.Source[0] = 0x00;
   tx_message.Source[1] = 0x00;
@@ -208,8 +208,8 @@ void SolaxModbus::register_address(uint8_t serial_number[14], uint8_t address) {
   this->send(&tx_message);
 }
 
-void SolaxModbus::discover_devices() {
-  static SolaxMessageT tx_message;
+void emh1Modbus::discover_devices() {
+  static emh1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -222,7 +222,7 @@ void SolaxModbus::discover_devices() {
   this->send(&tx_message);
 }
 
-void SolaxModbus::send(SolaxMessageT *tx_message) {
+void emh1Modbus::send(emh1MessageT *tx_message) {
   uint8_t msg_len;
 
   tx_message->Header[0] = 0xAA;
@@ -247,5 +247,5 @@ void SolaxModbus::send(SolaxMessageT *tx_message) {
     this->flow_control_pin_->digital_write(false);
 }
 
-}  // namespace solax_modbus
+}  // namespace emh1_modbus
 }  // namespace esphome

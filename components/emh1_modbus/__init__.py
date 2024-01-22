@@ -5,22 +5,22 @@ import esphome.config_validation as cv
 from esphome.const import CONF_ADDRESS, CONF_FLOW_CONTROL_PIN, CONF_ID
 from esphome.cpp_helpers import gpio_pin_expression
 
-CODEOWNERS = ["@syssi"]
+CODEOWNERS = ["@jrv"]
 
 DEPENDENCIES = ["uart"]
 MULTI_CONF = True
 
-CONF_SOLAX_MODBUS_ID = "solax_modbus_id"
+CONF_EMH1_MODBUS_ID = "emh1_modbus_id"
 CONF_SERIAL_NUMBER = "serial_number"
 
-solax_modbus_ns = cg.esphome_ns.namespace("solax_modbus")
-SolaxModbus = solax_modbus_ns.class_("SolaxModbus", cg.Component, uart.UARTDevice)
-SolaxModbusDevice = solax_modbus_ns.class_("SolaxModbusDevice")
+emh1_modbus_ns = cg.esphome_ns.namespace("emh1_modbus")
+Emh1Modbus = emh1_modbus_ns.class_("Emh1Modbus", cg.Component, uart.UARTDevice)
+Emh1ModbusDevice = emh1_modbus_ns.class_("Emh1ModbusDevice")
 
 CONFIG_SCHEMA = (
     cv.Schema(
         {
-            cv.GenerateID(): cv.declare_id(SolaxModbus),
+            cv.GenerateID(): cv.declare_id(Emh1Modbus),
             cv.Optional(CONF_FLOW_CONTROL_PIN): pins.gpio_output_pin_schema,
         }
     )
@@ -55,7 +55,7 @@ def as_hex_array(value):
 
 
 async def to_code(config):
-    cg.add_global(solax_modbus_ns.using)
+    cg.add_global(emh1_modbus_ns.using)
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
@@ -66,9 +66,9 @@ async def to_code(config):
         cg.add(var.set_flow_control_pin(pin))
 
 
-def solax_modbus_device_schema(default_address, default_serial):
+def emh1_modbus_device_schema(default_address, default_serial):
     schema = {
-        cv.GenerateID(CONF_SOLAX_MODBUS_ID): cv.use_id(SolaxModbus),
+        cv.GenerateID(CONF_EMH1_MODBUS_ID): cv.use_id(Emh1Modbus),
     }
     if default_address is None:
         schema[cv.Required(CONF_ADDRESS)] = cv.hex_uint8_t
@@ -85,8 +85,8 @@ def solax_modbus_device_schema(default_address, default_serial):
     return cv.Schema(schema)
 
 
-async def register_solax_modbus_device(var, config):
-    parent = await cg.get_variable(config[CONF_SOLAX_MODBUS_ID])
+async def register_emh1_modbus_device(var, config):
+    parent = await cg.get_variable(config[CONF_EMH1_MODBUS_ID])
     cg.add(var.set_parent(parent))
     cg.add(var.set_address(config[CONF_ADDRESS]))
     cg.add(var.set_serial_number(as_hex_array(config[CONF_SERIAL_NUMBER])))
