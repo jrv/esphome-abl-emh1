@@ -14,8 +14,8 @@ CONF_EMH1_MODBUS_ID = "emh1_modbus_id"
 CONF_SERIAL_NUMBER = "serial_number"
 
 emh1_modbus_ns = cg.esphome_ns.namespace("emh1_modbus")
-Emh1Modbus = emh1_modbus_ns.class_("Emh1Modbus", cg.Component, uart.UARTDevice)
-Emh1ModbusDevice = emh1_modbus_ns.class_("Emh1ModbusDevice")
+Emh1Modbus = emh1_modbus_ns.class_("eMH1Modbus", cg.Component, uart.UARTDevice)
+Emh1ModbusDevice = emh1_modbus_ns.class_("eMH1ModbusDevice")
 
 CONFIG_SCHEMA = (
     cv.Schema(

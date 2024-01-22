@@ -9,13 +9,13 @@ namespace emh1_modbus {
 
 static const char *const TAG = "emh1_modbus";
 
-void emh1Modbus::setup() {
+void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
     this->flow_control_pin_->setup();
   }
 }
 
-void emh1Modbus::loop() {
+void eMH1Modbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_emh1_modbus_byte_ > 50) {
     this->rx_buffer_.clear();
@@ -52,7 +52,7 @@ uint16_t chksum(const uint8_t data[], const uint8_t len) {
   return checksum;
 }
 
-bool emh1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
+bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const uint8_t *frame = &this->rx_buffer_[0];
@@ -68,7 +68,7 @@ bool emh1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   if (at == 2)
     return true;
 
-  // Byte 3: emh1 device address
+  // Byte 3: eMH1 device address
   if (at == 3)
     return true;
   uint8_t address = frame[3];
@@ -131,27 +131,27 @@ bool emh1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   }
 
   if (!found) {
-    ESP_LOGW(TAG, "Got emh1 frame from unknown device address 0x%02X!", address);
+    ESP_LOGW(TAG, "Got eMH1 frame from unknown device address 0x%02X!", address);
   }
 
   // return false to reset buffer
   return false;
 }
 
-void emh1Modbus::dump_config() {
-  ESP_LOGCONFIG(TAG, "emh1Modbus:");
+void eMH1Modbus::dump_config() {
+  ESP_LOGCONFIG(TAG, "eMH1Modbus:");
   LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
 
   this->check_uart_settings(9600);
 }
 
-float emh1Modbus::get_setup_priority() const {
+float eMH1Modbus::get_setup_priority() const {
   // After UART bus
   return setup_priority::BUS - 1.0f;
 }
 
-void emh1Modbus::query_status_report(uint8_t address) {
-  static emh1MessageT tx_message;
+void eMH1Modbus::query_status_report(uint8_t address) {
+  static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -164,8 +164,8 @@ void emh1Modbus::query_status_report(uint8_t address) {
   this->send(&tx_message);
 }
 
-void emh1Modbus::query_device_info(uint8_t address) {
-  static emh1MessageT tx_message;
+void eMH1Modbus::query_device_info(uint8_t address) {
+  static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -178,8 +178,8 @@ void emh1Modbus::query_device_info(uint8_t address) {
   this->send(&tx_message);
 }
 
-void emh1Modbus::query_config_settings(uint8_t address) {
-  static emh1MessageT tx_message;
+void eMH1Modbus::query_config_settings(uint8_t address) {
+  static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -192,8 +192,8 @@ void emh1Modbus::query_config_settings(uint8_t address) {
   this->send(&tx_message);
 }
 
-void emh1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
-  static emh1MessageT tx_message;
+void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
+  static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x00;
   tx_message.Source[1] = 0x00;
@@ -208,8 +208,8 @@ void emh1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
   this->send(&tx_message);
 }
 
-void emh1Modbus::discover_devices() {
-  static emh1MessageT tx_message;
+void eMH1Modbus::discover_devices() {
+  static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x01;
   tx_message.Source[1] = 0x00;
@@ -222,7 +222,7 @@ void emh1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
-void Emh1Modbus::send(emh1MessageT *tx_message) {
+void eMH1Modbus::send(eMH1MessageT *tx_message) {
   uint8_t msg_len;
 
   tx_message->Header[0] = 0xAA;

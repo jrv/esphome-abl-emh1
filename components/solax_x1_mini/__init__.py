@@ -11,7 +11,7 @@ CONF_SOLAX_X1_MINI_ID = "solax_x1_mini_id"
 
 solax_x1_mini_ns = cg.esphome_ns.namespace("solax_x1_mini")
 SolaxX1Mini = solax_x1_mini_ns.class_(
-    "SolaxX1Mini", cg.PollingComponent, emh1_modbus.Emh1ModbusDevice
+    "SolaxX1Mini", cg.PollingComponent, emh1_modbus.eMH1ModbusDevice
 )
 
 CONFIG_SCHEMA = (
