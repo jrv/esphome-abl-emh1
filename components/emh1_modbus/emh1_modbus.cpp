@@ -207,6 +207,26 @@ void eMH1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
+uint8_t int2char(uint8_t val, char* outStr, uint8_t offset) {
+  uint8_t highBits = (val & 0xF0) >> 4;
+  uint8_t lowBits = (val & 0x0F);
+  outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
+  outStr[offset+1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
+	return offset+2;
+}
+
+uint8_t int2char(uint16_t val, char* outStr, uint8_t offset) {
+  uint8_t highBits = (val & 0xF000) >> 12;
+  uint8_t lowBits = (val & 0x0F00) >> 8;
+  outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
+  outStr[offset+1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
+  uint8_t highBits = (val & 0x00F0) >> 4;
+  uint8_t lowBits = (val & 0x000F);
+  outStr[offset+2] = (highBits > 0x09)?(highBits+55):(highBits+48);
+  outStr[offset+3] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
+	return offset+4;
+}
+
 uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val & 0xF0) >> 4;
@@ -217,23 +237,22 @@ uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
 	return offset+cnt*2;
 }
 
-
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
   // Send Modbus query as ASCII text (modbus-ascii !)
 	char buffer[200];
 	uint8_t size = 0;
 	buffer[size++] = ':';
-	size = int2char(&tx_message->DeviceId, buffer, size, 1);
-	size = int2char(&tx_message->FunctionCode, buffer, size, 1);
-	size = int2char(&tx_message->Destination, buffer, size, 2);
-	size = int2char(*tx_message->DataLength, buffer, size, 2);
+	size = int2char(tx_message->DeviceId, buffer, size);
+	size = int2char(tx_message->FunctionCode, buffer, size);
+	size = int2char(tx_message->Destination, buffer, size);
+	size = int2char(tx_message->DataLength, buffer, size);
 	if (tx_message->FunctionCode == 0x03) {
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(&tx_message->LRC, buffer, size, 1);
+	  size = int2char(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(&tx_message->LRC, buffer, size, 1);
+	  size = int2char(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
