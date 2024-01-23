@@ -240,7 +240,7 @@ uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
 }
 
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
-  ESP_LOGVV(TAG, "TX -> Basics");
+  ESP_LOGW(TAG, "TX -> Basics");
   // Send Modbus query as ASCII text (modbus-ascii !)
 	char buffer[200];
 	uint8_t size = 0;
@@ -259,7 +259,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
-  ESP_LOGVV(TAG, "TX -> %s", buffer);
+  ESP_LOGW(TAG, "TX -> %s", buffer);
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
   this->write_array((const uint8_t *)buffer, size);
