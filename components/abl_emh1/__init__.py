@@ -18,7 +18,7 @@ CONFIG_SCHEMA = (
     cv.Schema({cv.GenerateID(): cv.declare_id(ABLeMH1)})
     .extend(cv.polling_component_schema("30s"))
     .extend(
-        emh1_modbus.emh1_modbus_device_schema(0x0A, "3132333435363737363534333231")
+        emh1_modbus.emh1_modbus_device_schema(0x0A)
     )
 )
 
