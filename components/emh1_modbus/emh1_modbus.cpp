@@ -13,7 +13,7 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
     this->flow_control_pin_->setup();
   }
-	pinMode(5, OUTPUT);
+  ESP_LOGD(TAG, "Flow control pin setup";
 }
 
 void eMH1Modbus::loop() {
@@ -135,7 +135,7 @@ void eMH1Modbus::dump_config() {
   ESP_LOGCONFIG(TAG, "eMH1Modbus:");
   LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
 
-  this->check_uart_settings(9600);
+  this->check_uart_settings(38400);
 }
 
 float eMH1Modbus::get_setup_priority() const {
@@ -261,14 +261,12 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
-  // if (this->flow_control_pin_ != nullptr)
-  //  this->flow_control_pin_->digital_write(true);
-	digitalWrite(5, true);
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(true);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
-	digitalWrite(5, false);
-  //if (this->flow_control_pin_ != nullptr)
-  //  this->flow_control_pin_->digital_write(false);
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(false);
 }
 
 }  // namespace emh1_modbus
