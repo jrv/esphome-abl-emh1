@@ -101,12 +101,6 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
         ),
-        cv.Optional(CONF_ERROR_BITS): sensor.sensor_schema(
-            unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_ERROR_BITS,
-            accuracy_decimals=0,
-            device_class=DEVICE_CLASS_EMPTY,
-        ),
         cv.Optional(CONF_MODE): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
             icon=ICON_MODE,
