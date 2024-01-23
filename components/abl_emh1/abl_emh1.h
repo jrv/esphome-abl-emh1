@@ -16,9 +16,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void set_l2_current_sensor(sensor::Sensor *l2_current_sensor) { l2_current_sensor_ = l2_current_sensor; }
   void set_l3_current_sensor(sensor::Sensor *l3_current_sensor) { l3_current_sensor_ = l3_current_sensor; }
 	void set_max_current(sensor::Sensor *max_current_sensor) { max_current_sensor_ = max_current_sensor; }
-	// Serial number :010300500008A4 CRLF
   void set_serial_numer(sensor::Sensor *serial_number) { serial_number_ = serial_number; }
-	// Outlet State zit in 0x0033-0x0035 (Read current amps)
 	void set_outlet_state(sensor::Sensor *outlet_state) { outlet_state_ = outlet_state; }
   uint8_t get_no_response_count() { return no_response_count_; }
 
