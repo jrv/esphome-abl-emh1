@@ -174,25 +174,15 @@ void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
 }
 
 void ABLeMH1::publish_device_offline_() {
-//  this->publish_state_(this->mode_sensor_, -1);
-//  this->publish_state_(this->mode_name_text_sensor_, "Offline");
-//
-//  this->publish_state_(this->temperature_sensor_, NAN);
-//  this->publish_state_(this->dc1_voltage_sensor_, 0);
-//  this->publish_state_(this->dc2_voltage_sensor_, 0);
-//  this->publish_state_(this->dc1_current_sensor_, 0);
-//  this->publish_state_(this->dc2_current_sensor_, 0);
-//  this->publish_state_(this->ac_current_sensor_, 0);
-//  this->publish_state_(this->ac_voltage_sensor_, NAN);
-//  this->publish_state_(this->ac_frequency_sensor_, NAN);
-//  this->publish_state_(this->ac_power_sensor_, 0);
-//  this->publish_state_(this->grid_voltage_fault_sensor_, NAN);
-//  this->publish_state_(this->grid_frequency_fault_sensor_, NAN);
-//  this->publish_state_(this->dc_injection_fault_sensor_, NAN);
-//  this->publish_state_(this->temperature_fault_sensor_, NAN);
-//  this->publish_state_(this->pv1_voltage_fault_sensor_, NAN);
-//  this->publish_state_(this->pv2_voltage_fault_sensor_, NAN);
-//  this->publish_state_(this->gfc_fault_sensor_, NAN);
+  this->publish_state_(this->mode_sensor_, -1);
+  this->publish_state_(this->l1_current_sensor_, NAN);
+  this->publish_state_(this->l2_current_sensor_, NAN);
+  this->publish_state_(this->l3_current_sensor_, NAN);
+  this->publish_state_(this->max_current_sensor_, NAN);
+  this->publish_state_(this->serial_number_sensor_, NAN);
+  this->publish_state_(this->outlet_state_sensor_, NAN);
+  this->publish_state_(this->mode_name_text_sensor_, "Offline");
+	this->publish_state_(this->errors_text_sensor_, "Offline");
 }
 
 void ABLeMH1::update() {

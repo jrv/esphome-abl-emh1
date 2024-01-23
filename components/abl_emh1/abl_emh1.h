@@ -12,6 +12,7 @@ static const uint8_t REDISCOVERY_THRESHOLD = 5;
 
 class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
  public:
+  void set_mode_sensor(sensor::Sensor *mode_sensor) { mode_sensor_ = mode_sensor; }
   void set_l1_current_sensor(sensor::Sensor *l1_current_sensor) { l1_current_sensor_ = l1_current_sensor; }
   void set_l2_current_sensor(sensor::Sensor *l2_current_sensor) { l2_current_sensor_ = l2_current_sensor; }
   void set_l3_current_sensor(sensor::Sensor *l3_current_sensor) { l3_current_sensor_ = l3_current_sensor; }
@@ -27,6 +28,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void dump_config() override;
 
  protected:
+  sensor::Sensor *mode_sensor_;
   sensor::Sensor *l1_current_sensor_;
   sensor::Sensor *l2_current_sensor_;
   sensor::Sensor *l3_current_sensor_;
