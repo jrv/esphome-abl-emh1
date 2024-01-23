@@ -223,17 +223,17 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	char buffer[200];
 	uint8_t size = 0;
 	buffer[size++] = ':';
-	size = int2char(tx_message->DeviceId, buffer, size, 1);
-	size = int2char(tx_message->FunctionCode, buffer, size, 1);
-	size = int2char(tx_message->Destination, buffer, size, 2);
-	size = int2char(tx_message->DataLength, buffer, size, 2);
+	size = int2char(&tx_message->DeviceId, buffer, size, 1);
+	size = int2char(&tx_message->FunctionCode, buffer, size, 1);
+	size = int2char(&tx_message->Destination, buffer, size, 2);
+	size = int2char(*tx_message->DataLength, buffer, size, 2);
 	if (tx_message->FunctionCode == 0x03) {
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(tx_message->LRC, buffer, size, 1);
+	  size = int2char(&tx_message->LRC, buffer, size, 1);
 	} else {
 	  // TODO: write moet nog!!!@
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(tx_message->LRC, buffer, size, 1);
+	  size = int2char(&tx_message->LRC, buffer, size, 1);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
