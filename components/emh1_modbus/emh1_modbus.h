@@ -7,13 +7,13 @@ namespace esphome {
 namespace emh1_modbus {
 
 struct eMH1MessageT {
-  uint8_t Header[2];
-  uint8_t Source[2];
-  uint8_t Destination[2];
-  uint8_t ControlCode;
-  uint8_t FunctionCode;
-  uint8_t DataLength;
-  uint8_t Data[100];
+  uint8_t DeviceId;
+	uint8_t FunctionCode;
+	uint16_t Destination;
+	uint16_t DataLength;
+	uint8_t LRC;
+	uint8_t WriteBytes;
+	uint8_t WriteData[100];
 };
 
 class eMH1ModbusDevice;
@@ -32,14 +32,11 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
 
   float get_setup_priority() const override;
 
-  void send(const char *bytes);
   void send(eMH1MessageT *tx_message);
   void query_status_report(uint8_t address);
   void query_device_info(uint8_t address);
   void query_config_settings(uint8_t address);
   void discover_devices();
-//  void register_address(uint8_t serial_number[14], uint8_t address);
-  void register_address(uint8_t address);
 
  protected:
   bool parse_emh1_modbus_byte_(uint8_t byte);

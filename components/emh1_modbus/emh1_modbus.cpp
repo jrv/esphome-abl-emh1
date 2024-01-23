@@ -116,7 +116,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
         device->on_emh1_modbus_data(frame[7], data);
       } else {
         ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
-                 format_hex_pretty(frame, at + 1).c_str());
+                 fconst char* const*ormat_hex_pretty(frame, at + 1).c_str());
       }
       found = true;
     }
@@ -142,45 +142,7 @@ float eMH1Modbus::get_setup_priority() const {
   return setup_priority::BUS - 1.0f;
 }
 
-void eMH1Modbus::query_status_report(uint8_t address) {
-  static const char query[] = ":0103002E0032";	
-  this->send(query);
-}
-
-void eMH1Modbus::query_device_info(uint8_t address) {
-  static const char query[] = ":0103002C0001";
-  this->send(query);
-}
-
-void eMH1Modbus::query_config_settings(uint8_t address) {
-  static const char query[] = ":010300010002";
-  this->send(query);
-}
-
-// void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
-void eMH1Modbus::register_address(uint8_t address) {
-  static eMH1MessageT tx_message;
-
-  tx_message.Source[0] = 0x00;
-  tx_message.Source[1] = 0x00;
-  tx_message.Destination[0] = 0x00;
-  tx_message.Destination[1] = 0x00;
-  tx_message.ControlCode = 0x10;
-  tx_message.FunctionCode = 0x01;
-  tx_message.DataLength = 0x0F;
-//  memcpy(tx_message.Data, serial_number, 14);
-  tx_message.Data[14] = address;
-
-  this->send(&tx_message);
-}
-
-void eMH1Modbus::discover_devices() {
-  // broadcast query for serial number
-  static const char query[] = ":000300500008";
-  this->send(query);
-}
-
-uint8_t Char2Int8(char value[2]) {
+uint8_t char2int8(char value[2]) {
   char c1 = value[0];
   uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
   char c2 = value[1];
@@ -188,7 +150,7 @@ uint8_t Char2Int8(char value[2]) {
   return (highBits << 4 | lowBits);
 }
 
-uint16_t Char2Int16(char value[4]) {
+uint16_t char2int16(char value[4]) {
   uint16_t res = 0;
   char c;
   uint16_t bits;
@@ -200,58 +162,86 @@ uint16_t Char2Int16(char value[4]) {
   return res;
 }
 
-/*
-char Int2Char(char *c, uint8_t value) {
-  uint8_t highBits = (value & 0xF0) >> 4;
-  uint8_t lowBits = (value & 0x0F);
-  c[0] = (highBits > 0x09)?(highBits+55):(highBits+48);
-  c[1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
-  return c;
-}
-*/
-
 uint8_t lrc(char *value, uint8_t l) {
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
-    lrc_ -= Char2Int8(&value[i]);
+    lrc_ -= char2int8(&value[i]);
   }
   return lrc_;
 }
 
-void eMH1Modbus::send(const char bytes[]) {
-  // Send Modbus query as ASCII text (modbus-ascii !)
-	uint8_t lrc_ = lrc(bytes, sizeof(bytes));
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(true);
-  this->print(bytes);
-	this->print(lrc_, HEX);
-	this->print("\r\n");
-  this->flush();
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(false);
+void eMH1Modbus::query_status_report(uint8_t address) {
+  static eMH1MessageT tx_message;
+	tx_message.DeviceId = 0x01;
+	tx_message.FunctionCode = 0x03;
+	tx_message.Destination = 0x002E;
+	tx_message.DataLength = 0x0032;
+  this->send(&tx_message);
 }
 
+void eMH1Modbus::query_device_info(uint8_t address) {
+  static eMH1MessageT tx_message;
+	tx_message.DeviceId = 0x01;
+	tx_message.FunctionCode = 0x03;
+	tx_message.Destination = 0x002C;
+	tx_message.DataLength = 0x0001;
+  this->send(&tx_message);
+}
+
+void eMH1Modbus::query_config_settings(uint8_t address) {
+  static eMH1MessageT tx_message;
+	tx_message.DeviceId = 0x01;
+	tx_message.FunctionCode = 0x03;
+	tx_message.Destination = 0x0001;
+	tx_message.DataLength = 0x0002;
+  this->send(&tx_message);
+}
+
+void eMH1Modbus::discover_devices() {
+  // broadcast query for serial number
+  static eMH1MessageT tx_message;
+	tx_message.DeviceId = 0x00;
+	tx_message.FunctionCode = 0x03;
+	tx_message.Destination = 0x0050;
+	tx_message.DataLength = 0x0008;
+  this->send(&tx_message);
+}
+
+uint8_t void int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
+  for (uint8_t x=0; x<cnt; x++) { 
+    uint8_t highBits = (val & 0xF0) >> 4;
+    uint8_t lowBits = (val & 0x0F);
+    outStr[2*x+offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
+    outStr[2*x+offset+1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
+  }
+	return offset+cnt*2;
+}
+
+
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
-  uint8_t msg_len;
-
-  tx_message->Header[0] = 0xAA;
-  tx_message->Header[1] = 0x55;
-
-  msg_len = tx_message->DataLength + 9;
-  auto checksum = 0;
-
-  tx_message->Data[tx_message->DataLength + 0] = checksum >> 8;
-  tx_message->Data[tx_message->DataLength + 1] = checksum >> 0;
-  msg_len += 2;
-
-  ESP_LOGVV(TAG, "TX -> %s", format_hex_pretty((const uint8_t *) tx_message, msg_len).c_str());
-
+  // Send Modbus query as ASCII text (modbus-ascii !)
+	char buffer[200];
+	uint8_t size = 0;
+	buffer[size++] = ':';
+	size = int2char(tx_message->DeviceId, buffer, size, 1);
+	size = int2char(tx_message->FunctionCode, buffer, size, 1);
+	size = int2char(tx_message->Destination, buffer, size, 2);
+	size = int2char(tx_message->DataLength, buffer, size, 2);
+	if (tx_message->FunctionCode == 0x03) {
+		tx_message->LRC = lrc(buffer, size);
+	  size = int2char(tx_message->LRC, buffer, size, 1);
+	} else {
+	  // TODO: write moet nog!!!@
+		tx_message->LRC = lrc(buffer, size);
+	  size = int2char(tx_message->LRC, buffer, size, 1);
+  }
+	buffer[size++] = "\r";
+	buffer[size++] = "\n";
+  ESP_LOGVV(TAG, "TX -> %s", buffer);
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
-
-  this->write_array((const uint8_t *) tx_message, msg_len);
+  this->write_array(buffer, size);
   this->flush();
-
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
 }
