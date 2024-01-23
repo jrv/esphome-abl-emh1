@@ -100,7 +100,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
     if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
       // ESP_LOGI(TAG, "Inverter discovered. Serial number: %s", hexencode_plain(&data.front(), data.size()).c_str());
       ESP_LOGI(TAG, "Charger discovered.");
-      this->register_address(0x01);
+      // this->register_address(0x01);
     } else {
       ESP_LOGW(TAG, "Unknown broadcast data: %s", format_hex_pretty(&data.front(), data.size()).c_str());
     }
@@ -116,7 +116,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
         device->on_emh1_modbus_data(frame[7], data);
       } else {
         ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
-                 fconst char* const*ormat_hex_pretty(frame, at + 1).c_str());
+                 format_hex_pretty(frame, at + 1).c_str());
       }
       found = true;
     }
@@ -235,12 +235,12 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 		tx_message->LRC = lrc(buffer, size);
 	  size = int2char(tx_message->LRC, buffer, size, 1);
   }
-	buffer[size++] = "\r";
-	buffer[size++] = "\n";
+	buffer[size++] = 0x0D;
+	buffer[size++] = 0x0A;
   ESP_LOGVV(TAG, "TX -> %s", buffer);
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
-  this->write_array(buffer, size);
+  this->write_array((const uint8_t *)buffer, size);
   this->flush();
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
