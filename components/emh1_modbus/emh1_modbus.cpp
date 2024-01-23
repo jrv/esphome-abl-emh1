@@ -263,7 +263,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
-	digitalWrite(5, LOW);
+	digitalWrite(5, HIGH);
   // if (this->flow_control_pin_ != nullptr)
   //  this->flow_control_pin_->digital_write(false);
   this->write_array((const uint8_t *)buffer, size);
