@@ -109,7 +109,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
     if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
       // ESP_LOGI(TAG, "Inverter discovered. Serial number: %s", hexencode_plain(&data.front(), data.size()).c_str());
       ESP_LOGI(TAG, "Charger discovered.");
-      this->register_address(data.data(), 0x0A);
+      this->register_address(0x01);
     } else {
       ESP_LOGW(TAG, "Unknown broadcast data: %s", format_hex_pretty(&data.front(), data.size()).c_str());
     }
@@ -152,17 +152,17 @@ float eMH1Modbus::get_setup_priority() const {
 }
 
 void eMH1Modbus::query_status_report(uint8_t address) {
-	static query = ":0103002E0032";	
+  static const char *const query = ":0103002E0032";	
   this->send(&query);
 }
 
 void eMH1Modbus::query_device_info(uint8_t address) {
-  static query = ":0103002C0001";
+  static const char *const query = ":0103002C0001";
   this->send(&query);
 }
 
 void eMH1Modbus::query_config_settings(uint8_t address) {
-  static query = ":010300010002";
+  static const char *const query = ":010300010002";
   this->send(&query);
 }
 
