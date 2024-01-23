@@ -192,7 +192,7 @@ uint16_t Char2Int16(char value[4]) {
   uint16_t res = 0;
   char c;
   uint16_t bits;
-  for (byte x=0; x<4; x++) {
+  for (uint8_t x=0; x<4; x++) {
     c = value[x];
     bits = (c > '9')?(c-55):(c-48);
     res = (res << 4 | bits);
@@ -200,13 +200,15 @@ uint16_t Char2Int16(char value[4]) {
   return res;
 }
 
-char Int2Char(char c[2], uint8_t value) {
+/*
+char Int2Char(char *c, uint8_t value) {
   uint8_t highBits = (value & 0xF0) >> 4;
   uint8_t lowBits = (value & 0x0F);
   c[0] = (highBits > 0x09)?(highBits+55):(highBits+48);
   c[1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
   return c;
 }
+*/
 
 uint8_t lrc(char *value, uint8_t l) {
   uint8_t lrc = 0;
