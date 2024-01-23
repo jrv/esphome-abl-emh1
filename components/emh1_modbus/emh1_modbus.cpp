@@ -184,21 +184,58 @@ void eMH1Modbus::register_address(uint8_t address) {
 }
 
 void eMH1Modbus::discover_devices() {
-  static eMH1MessageT tx_message;
-
-  tx_message.Source[0] = 0x01;
-  tx_message.Source[1] = 0x00;
-  tx_message.Destination[0] = 0x00;
-  tx_message.Destination[1] = 0x00;
-  tx_message.ControlCode = 0x10;
-  tx_message.FunctionCode = 0x00;
-  tx_message.DataLength = 0x00;
-
-  this->send(&tx_message);
+  // broadcast query for serial number
+  static const char *const query = ":000300500008"
+  this->send(&query);
 }
 
-void eMH1Modbus::send(const char* const*) {
+uint8_t eMH1Modbus::getLrc(char *value, byte l) {
+  uint8_t lrc = 0;
+  for (int i = 0; i < l-1; i = i + 2) {
+    lrc -= $this->Char2Int8(&value[i]);
+  }
+  return lrc;
+}
 
+uint8_t eMH1Modbus::Char2Int8(char value[2]) {
+  char c1 = value[0];
+  uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
+  char c2 = value[1];
+  uint8_t lowBits = (c2 > '9')?(c2-55):(c2-48);
+  return (highBits << 4 | lowBits);
+}
+
+uint16_t eMH1Modbus::Char2Int16(char value[4]) {
+  uint16_t res = 0;
+  char c;
+  uint16_t bits;
+  for (byte x=0; x<4; x++) {
+    c = value[x];
+    bits = (c > '9')?(c-55):(c-48);
+    res = (res << 4 | bits);
+  }
+  return res;
+}
+
+char *eMH1Modbus::Int2Char(char c[2], uint8_t value) {
+  uint8_t highBits = (value & 0xF0) >> 4;
+  uint8_t lowBits = (value & 0x0F);
+  c[0] = (highBits > 0x09)?(highBits+55):(highBits+48);
+  c[1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
+  return c;
+}
+
+void eMH1Modbus::send(const char* bytes) {
+  // Send Modbus query as ASCII text (modbus-ascii !)
+	uint8_t lrc = lrc.getLrc(bytes, sizeof(bytes));
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(true);
+  this->print(bytes);
+	this->print(lrc, HEX);
+	this->print("\r\n");
+  this->flush();
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(false);
 }
 
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
