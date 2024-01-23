@@ -15,7 +15,8 @@ void eMH1Modbus::setup() {
   //   this->flow_control_pin_->setup();
   // }
   // ESP_LOGD(TAG, "Flow control pin setup");
-	pinMode(5, OUTPUT);
+	pinMode(4, OUTPUT);
+	digitalWrite(4, LOW);
 }
 
 void eMH1Modbus::loop() {
