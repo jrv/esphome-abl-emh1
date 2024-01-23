@@ -18,8 +18,8 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_max_current_sensor(sensor::Sensor *max_current_sensor) { max_current_sensor_ = max_current_sensor; }
   void set_serial_number_sensor(sensor::Sensor *serial_number_sensor) { serial_number_sensor_ = serial_number_sensor; }
 	void set_outlet_state_sensor(sensor::Sensor *outlet_state_sensor) { outlet_state_sensor_ = outlet_state_sensor; }
-	void set_mode_name_text_sensor(sensor::TextSensor *mode_name_text_sensor) { mode_name_text_sensor_ = mode_name_text_sensor; }
-	void set_errors_text_sensor(sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
+	void set_mode_name_text_sensor(text_sensor::TextSensor *mode_name_text_sensor) { mode_name_text_sensor_ = mode_name_text_sensor; }
+	void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
   uint8_t get_no_response_count() { return no_response_count_; }
 
   void update() override;
