@@ -43,15 +43,6 @@ std::string hexencode_plain(const uint8_t *data, uint32_t len) {
   return res;
 }
 
-uint16_t chksum(const uint8_t data[], const uint8_t len) {
-  uint8_t i;
-  uint16_t checksum = 0;
-  for (i = 0; i <= len; i++) {
-    checksum = checksum + data[i];
-  }
-  return checksum;
-}
-
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
@@ -94,7 +85,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   }
 
   // Byte 9+data_len+1: CRC_HI (over all bytes)
-  uint16_t computed_checksum = chksum(frame, 9 + data_len - 1);
+  // uint16_t computed_checksum = lrc(frame, 9 + data_len - 1);
   uint16_t remote_checksum = uint16_t(frame[9 + data_len + 1]) | (uint16_t(frame[9 + data_len]) << 8);
   if (computed_checksum != remote_checksum) {
     ESP_LOGW(TAG, "Invalid checksum! 0x%02X !=  0x%02X", computed_checksum, remote_checksum);
@@ -189,15 +180,15 @@ void eMH1Modbus::discover_devices() {
   this->send(&query);
 }
 
-uint8_t eMH1Modbus::getLrc(char *value, byte l) {
+uint8_t lrc(char *value, uint8_t l) {
   uint8_t lrc = 0;
   for (int i = 0; i < l-1; i = i + 2) {
-    lrc -= $this->Char2Int8(&value[i]);
+    lrc -= Char2Int8(&value[i]);
   }
   return lrc;
 }
 
-uint8_t eMH1Modbus::Char2Int8(char value[2]) {
+uint8_t Char2Int8(char value[2]) {
   char c1 = value[0];
   uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
   char c2 = value[1];
@@ -205,7 +196,7 @@ uint8_t eMH1Modbus::Char2Int8(char value[2]) {
   return (highBits << 4 | lowBits);
 }
 
-uint16_t eMH1Modbus::Char2Int16(char value[4]) {
+uint16_t Char2Int16(char value[4]) {
   uint16_t res = 0;
   char c;
   uint16_t bits;
@@ -217,7 +208,7 @@ uint16_t eMH1Modbus::Char2Int16(char value[4]) {
   return res;
 }
 
-char *eMH1Modbus::Int2Char(char c[2], uint8_t value) {
+char Int2Char(char c[2], uint8_t value) {
   uint8_t highBits = (value & 0xF0) >> 4;
   uint8_t lowBits = (value & 0x0F);
   c[0] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -227,7 +218,7 @@ char *eMH1Modbus::Int2Char(char c[2], uint8_t value) {
 
 void eMH1Modbus::send(const char* bytes) {
   // Send Modbus query as ASCII text (modbus-ascii !)
-	uint8_t lrc = lrc.getLrc(bytes, sizeof(bytes));
+	uint8_t lrc = lrc(bytes, sizeof(bytes));
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
   this->print(bytes);
@@ -245,7 +236,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
   tx_message->Header[1] = 0x55;
 
   msg_len = tx_message->DataLength + 9;
-  auto checksum = chksum((const uint8_t *) tx_message, msg_len - 1);
+  auto checksum = 0;
 
   tx_message->Data[tx_message->DataLength + 0] = checksum >> 8;
   tx_message->Data[tx_message->DataLength + 1] = checksum >> 0;
