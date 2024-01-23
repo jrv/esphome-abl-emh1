@@ -197,6 +197,10 @@ void eMH1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
+void eMH1Modbus::send(const char* const*) {
+
+}
+
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
   uint8_t msg_len;
 
