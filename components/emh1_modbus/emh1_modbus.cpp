@@ -207,7 +207,7 @@ void eMH1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
-uint8_t void int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
+uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val & 0xF0) >> 4;
     uint8_t lowBits = (val & 0x0F);
