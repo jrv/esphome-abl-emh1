@@ -13,6 +13,7 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
     this->flow_control_pin_->setup();
   }
+	pinMode(5, OUTPUT);
 }
 
 void eMH1Modbus::loop() {
@@ -260,12 +261,14 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(true);
+  // if (this->flow_control_pin_ != nullptr)
+  //  this->flow_control_pin_->digital_write(true);
+	digitalWrite(5, true);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(false);
+	digitalWrite(5, false);
+  //if (this->flow_control_pin_ != nullptr)
+  //  this->flow_control_pin_->digital_write(false);
 }
 
 }  // namespace emh1_modbus
