@@ -6,6 +6,16 @@
 namespace esphome {
 namespace emh1_modbus {
 
+struct eMH1MessageT {
+  uint8_t Header[2];
+  uint8_t Source[2];
+  uint8_t Destination[2];
+  uint8_t ControlCode;
+  uint8_t FunctionCode;
+  uint8_t DataLength;
+  uint8_t Data[100];
+};
+
 class eMH1ModbusDevice;
 
 class eMH1Modbus : public uart::UARTDevice, public Component {
