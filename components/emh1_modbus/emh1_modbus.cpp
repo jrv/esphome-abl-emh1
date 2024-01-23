@@ -262,11 +262,13 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
   if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(true);
+    this->flow_control_pin_->digital_write(false);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
+  ESP_LOGCONFIG(TAG, "eMH1Modbus:");
+  LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
 }
 
 }  // namespace emh1_modbus
