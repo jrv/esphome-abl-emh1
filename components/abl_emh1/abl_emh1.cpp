@@ -255,9 +255,9 @@ void ABLeMH1::dump_config() {
 std::string ABLeMH1::error_bits_to_string_(const uint32_t mask) {
   std::string values = "";
   if (mask) {
-    for (int i = 0; i < ERRORS_SIZE; i++) {
+    for (int i = 0; i < STATE_SIZE; i++) {
       if (mask & (1 << i)) {
-        values.append(ERRORS[i]);
+        values.append(STATE[i]);
         values.append(";");
       }
     }
