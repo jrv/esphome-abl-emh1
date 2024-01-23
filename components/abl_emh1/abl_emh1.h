@@ -12,42 +12,14 @@ static const uint8_t REDISCOVERY_THRESHOLD = 5;
 
 class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
  public:
-  void set_energy_today_sensor(sensor::Sensor *energy_today_sensor) { energy_today_sensor_ = energy_today_sensor; }
-  void set_energy_total_sensor(sensor::Sensor *energy_total_sensor) { energy_total_sensor_ = energy_total_sensor; }
-  void set_dc1_current_sensor(sensor::Sensor *dc1_current_sensor) { dc1_current_sensor_ = dc1_current_sensor; }
-  void set_dc2_current_sensor(sensor::Sensor *dc2_current_sensor) { dc2_current_sensor_ = dc2_current_sensor; }
-  void set_dc1_voltage_sensor(sensor::Sensor *dc1_voltage_sensor) { dc1_voltage_sensor_ = dc1_voltage_sensor; }
-  void set_dc2_voltage_sensor(sensor::Sensor *dc2_voltage_sensor) { dc2_voltage_sensor_ = dc2_voltage_sensor; }
-  void set_ac_current_sensor(sensor::Sensor *ac_current_sensor) { ac_current_sensor_ = ac_current_sensor; }
-  void set_ac_frequency_sensor(sensor::Sensor *ac_frequency_sensor) { ac_frequency_sensor_ = ac_frequency_sensor; }
-  void set_ac_power_sensor(sensor::Sensor *ac_power_sensor) { ac_power_sensor_ = ac_power_sensor; }
-  void set_ac_voltage_sensor(sensor::Sensor *ac_voltage_sensor) { ac_voltage_sensor_ = ac_voltage_sensor; }
-  void set_temperature_sensor(sensor::Sensor *temperature_sensor) { temperature_sensor_ = temperature_sensor; }
-  void set_mode_sensor(sensor::Sensor *mode_sensor) { mode_sensor_ = mode_sensor; }
-  void set_mode_name_text_sensor(text_sensor::TextSensor *sensor) { this->mode_name_text_sensor_ = sensor; }
-  void set_error_bits_sensor(sensor::Sensor *error_bits_sensor) { error_bits_sensor_ = error_bits_sensor; }
-  void set_errors_text_sensor(text_sensor::TextSensor *sensor) { this->errors_text_sensor_ = sensor; }
-  void set_runtime_total_sensor(sensor::Sensor *runtime_total_sensor) { runtime_total_sensor_ = runtime_total_sensor; }
-  void set_grid_voltage_fault_sensor(sensor::Sensor *grid_voltage_fault_sensor) {
-    grid_voltage_fault_sensor_ = grid_voltage_fault_sensor;
-  }
-  void set_grid_frequency_fault_sensor(sensor::Sensor *grid_frequency_fault_sensor) {
-    grid_frequency_fault_sensor_ = grid_frequency_fault_sensor;
-  }
-  void set_dc_injection_fault_sensor(sensor::Sensor *dc_injection_fault_sensor) {
-    dc_injection_fault_sensor_ = dc_injection_fault_sensor;
-  }
-  void set_temperature_fault_sensor(sensor::Sensor *temperature_fault_sensor) {
-    temperature_fault_sensor_ = temperature_fault_sensor;
-  }
-  void set_pv1_voltage_fault_sensor(sensor::Sensor *pv1_voltage_fault_sensor) {
-    pv1_voltage_fault_sensor_ = pv1_voltage_fault_sensor;
-  }
-  void set_pv2_voltage_fault_sensor(sensor::Sensor *pv2_voltage_fault_sensor) {
-    pv2_voltage_fault_sensor_ = pv2_voltage_fault_sensor;
-  }
-  void set_gfc_fault_sensor(sensor::Sensor *gfc_fault_sensor) { gfc_fault_sensor_ = gfc_fault_sensor; }
-
+  void set_l1_current_sensor(sensor::Sensor *l1_current_sensor) { l1_current_sensor_ = l1_current_sensor; }
+  void set_l2_current_sensor(sensor::Sensor *l2_current_sensor) { l2_current_sensor_ = l2_current_sensor; }
+  void set_l3_current_sensor(sensor::Sensor *l3_current_sensor) { l3_current_sensor_ = l3_current_sensor; }
+	void set_max_current(sensor::Sensor *max_current_sensor) { max_current_sensor_ = max_current_sensor; }
+	// Serial number :010300500008A4 CRLF
+  void set_serial_numer(sensor::Sensor *serial_number) { serial_number_ = serial_number; }
+	// Outlet State zit in 0x0033-0x0035 (Read current amps)
+	void set_outlet_state(sensor::Sensor *outlet_state) { outlet_state_ = outlet_state; }
   uint8_t get_no_response_count() { return no_response_count_; }
 
   void update() override;
@@ -55,27 +27,12 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void dump_config() override;
 
  protected:
-  sensor::Sensor *energy_today_sensor_;
-  sensor::Sensor *energy_total_sensor_;
-  sensor::Sensor *dc1_current_sensor_;
-  sensor::Sensor *dc2_current_sensor_;
-  sensor::Sensor *dc1_voltage_sensor_;
-  sensor::Sensor *dc2_voltage_sensor_;
-  sensor::Sensor *ac_current_sensor_;
-  sensor::Sensor *ac_frequency_sensor_;
-  sensor::Sensor *ac_power_sensor_;
-  sensor::Sensor *ac_voltage_sensor_;
-  sensor::Sensor *temperature_sensor_;
-  sensor::Sensor *mode_sensor_;
-  sensor::Sensor *error_bits_sensor_;
-  sensor::Sensor *runtime_total_sensor_;
-  sensor::Sensor *grid_voltage_fault_sensor_;
-  sensor::Sensor *grid_frequency_fault_sensor_;
-  sensor::Sensor *dc_injection_fault_sensor_;
-  sensor::Sensor *temperature_fault_sensor_;
-  sensor::Sensor *pv1_voltage_fault_sensor_;
-  sensor::Sensor *pv2_voltage_fault_sensor_;
-  sensor::Sensor *gfc_fault_sensor_;
+  sensor::Sensor *l1_current_sensor_;
+  sensor::Sensor *l2_current_sensor_;
+  sensor::Sensor *l3_current_sensor_;
+  sensor::Sensor *max_current_sensor_;
+  sensor::Sensor *serial_number_;
+  sensor::Sensor *outlet_state_;
 
   text_sensor::TextSensor *mode_name_text_sensor_;
   text_sensor::TextSensor *errors_text_sensor_;

@@ -107,7 +107,8 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   if (address == BROADCAST_ADDRESS) {
     // check control code && function code
     if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
-      ESP_LOGI(TAG, "Inverter discovered. Serial number: %s", hexencode_plain(&data.front(), data.size()).c_str());
+      // ESP_LOGI(TAG, "Inverter discovered. Serial number: %s", hexencode_plain(&data.front(), data.size()).c_str());
+      ESP_LOGI(TAG, "Charger discovered.");
       this->register_address(data.data(), 0x0A);
     } else {
       ESP_LOGW(TAG, "Unknown broadcast data: %s", format_hex_pretty(&data.front(), data.size()).c_str());
@@ -151,48 +152,22 @@ float eMH1Modbus::get_setup_priority() const {
 }
 
 void eMH1Modbus::query_status_report(uint8_t address) {
-  static eMH1MessageT tx_message;
-
-  tx_message.Source[0] = 0x01;
-  tx_message.Source[1] = 0x00;
-  tx_message.Destination[0] = 0x00;
-  tx_message.Destination[1] = address;
-  tx_message.ControlCode = 0x11;
-  tx_message.FunctionCode = 0x02;
-  tx_message.DataLength = 0x00;
-
-  this->send(&tx_message);
+	static query = ":0103002E0032";	
+  this->send(&query);
 }
 
 void eMH1Modbus::query_device_info(uint8_t address) {
-  static eMH1MessageT tx_message;
-
-  tx_message.Source[0] = 0x01;
-  tx_message.Source[1] = 0x00;
-  tx_message.Destination[0] = 0x00;
-  tx_message.Destination[1] = address;
-  tx_message.ControlCode = 0x11;
-  tx_message.FunctionCode = 0x03;
-  tx_message.DataLength = 0x00;
-
-  this->send(&tx_message);
+  static query = ":0103002C0001";
+  this->send(&query);
 }
 
 void eMH1Modbus::query_config_settings(uint8_t address) {
-  static eMH1MessageT tx_message;
-
-  tx_message.Source[0] = 0x01;
-  tx_message.Source[1] = 0x00;
-  tx_message.Destination[0] = 0x00;
-  tx_message.Destination[1] = address;
-  tx_message.ControlCode = 0x11;
-  tx_message.FunctionCode = 0x04;
-  tx_message.DataLength = 0x00;
-
-  this->send(&tx_message);
+  static query = ":010300010002";
+  this->send(&query);
 }
 
-void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
+// void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
+void eMH1Modbus::register_address(uint8_t address) {
   static eMH1MessageT tx_message;
 
   tx_message.Source[0] = 0x00;
@@ -202,7 +177,7 @@ void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
   tx_message.ControlCode = 0x10;
   tx_message.FunctionCode = 0x01;
   tx_message.DataLength = 0x0F;
-  memcpy(tx_message.Data, serial_number, 14);
+//  memcpy(tx_message.Data, serial_number, 14);
   tx_message.Data[14] = address;
 
   this->send(&tx_message);

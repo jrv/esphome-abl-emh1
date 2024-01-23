@@ -21,40 +21,24 @@ static const std::string MODES[MODES_SIZE] = {
     "Self Test",        // 6
 };
 
-static const uint8_t ERRORS_SIZE = 32;
-static const char *const ERRORS[ERRORS_SIZE] = {
-    "TZ Protect Fault",                          // 0000 0000 0000 0000 0000 0000 0000 0001 (1)
-    "Grid Lost Fault",                           // 0000 0000 0000 0000 0000 0000 0000 0010 (2)
-    "Grid Voltage Fault",                        // 0000 0000 0000 0000 0000 0000 0000 0100 (3)
-    "Grid Frequency Fault",                      // 0000 0000 0000 0000 0000 0000 0000 1000 (4)
-    "PLL Lost Fault",                            // 0000 0000 0000 0000 0000 0000 0001 0000 (5)
-    "Bus Voltage Fault",                         // 0000 0000 0000 0000 0000 0000 0010 0000 (6)
-    "Error (Bit 6)",                             // 0000 0000 0000 0000 0000 0000 0100 0000 (7)
-    "Oscillator Fault",                          // 0000 0000 0000 0000 0000 0000 1000 0000 (8)
-    "DCI Over Current Protection Fault",         // 0000 0000 0000 0000 0000 0001 0000 0000 (9)
-    "Residual Current Fault",                    // 0000 0000 0000 0000 0000 0010 0000 0000 (10)
-    "PV Voltage Fault",                          // 0000 0000 0000 0000 0000 0100 0000 0000 (11)
-    "AC voltage out of range since 10 minutes",  // 0000 0000 0000 0000 0000 1000 0000 0000 (12)
-    "Isolation Fault",                           // 0000 0000 0000 0000 0001 0000 0000 0000 (13)
-    "Over Temperature Fault",                    // 0000 0000 0000 0000 0010 0000 0000 0000 (14)
-    "Fan Fault",                                 // 0000 0000 0000 0000 0100 0000 0000 0000 (15)
-    "Error (Bit 15)",                            // 0000 0000 0000 0000 1000 0000 0000 0000 (16)
-    "SPI Communication Fault",                   // 0000 0000 0000 0001 0000 0000 0000 0000 (17)
-    "SCI Communication Fault",                   // 0000 0000 0000 0010 0000 0000 0000 0000 (18)
-    "Error (Bit 18)",                            // 0000 0000 0000 0100 0000 0000 0000 0000 (19)
-    "Input Configuration Fault",                 // 0000 0000 0000 1000 0000 0000 0000 0000 (20)
-    "EEPROM Fault",                              // 0000 0000 0001 0000 0000 0000 0000 0000 (21)
-    "Relay Fault",                               // 0000 0000 0010 0000 0000 0000 0000 0000 (22)
-    "Sample Consistence Fault",                  // 0000 0000 0100 0000 0000 0000 0000 0000 (23)
-    "Residual Current Device Fault",             // 0000 0000 1000 0000 0000 0000 0000 0000 (24)
-    "Error (Bit 24)",                            // 0000 0001 0000 0000 0000 0000 0000 0000 (25)
-    "Error (Bit 25)",                            // 0000 0010 0000 0000 0000 0000 0000 0000 (26)
-    "Error (Bit 26)",                            // 0000 0100 0000 0000 0000 0000 0000 0000 (27)
-    "Error (Bit 27)",                            // 0000 1000 0000 0000 0000 0000 0000 0000 (28)
-    "Error (Bit 28)",                            // 0001 0000 0000 0000 0000 0000 0000 0000 (29)
-    "DCI Device Fault",                          // 0010 0000 0000 0000 0000 0000 0000 0000 (30)
-    "Other Device Fault",                        // 0100 0000 0000 0000 0000 0000 0000 0000 (31)
-    "Error (Bit 31)",                            // 1000 0000 0000 0000 0000 0000 0000 0000 (32)
+static const uint8_t ERRORS_SIZE = 12;
+static const char *const STATE[STATE_SIZE] = {
+	"Waiting for EV",													// A1
+	"EV is asking for charging", 							// B1
+	"EV has the permission to charge",				// B2
+	"EV is charged",													// C2
+	"C2, reduced current (error F16, F17)",		// C3
+	"C2, reduced current (imbalance F15)",		// C4
+	"Outlet disabled",												// E0
+	"Production test",												// E1
+	"EVCC setup mode",												// E2
+	"Bus idle",																// E3
+	"Unintended closed contact (Welding)",		// F1
+	"Internal error",													// F2
+};
+static const char * const STATECODE[STATE_SIZE] = {
+  "A1", "B1", "B2", "C2", "C3", "c4", 
+	"E0", "E1", "E2", "E3", "F1", "F2"
 };
 
 void ABLeMH1::on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
@@ -105,84 +89,6 @@ void ABLeMH1::decode_config_settings_(const std::vector<uint8_t> &data) {
   ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
   ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", emh1_get_16bit(2));
   ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", emh1_get_16bit(4) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMaxProtect [15.16]: %f V", emh1_get_16bit(6) * 0.1f);
-  ESP_LOGI(TAG, "  wFacMinProtect [17.18]: %f Hz", emh1_get_16bit(8) * 0.01f);
-  ESP_LOGI(TAG, "  wFacMaxProtect [19.20]: %f Hz", emh1_get_16bit(10) * 0.01f);
-  ESP_LOGI(TAG, "  wDciLimits [21.22]: %d mA", emh1_get_16bit(12));
-  ESP_LOGI(TAG, "  wGrid10MinAvgProtect [23,24]: %f V", emh1_get_16bit(14) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMinSlowProtect [25.26]: %f V", emh1_get_16bit(16) * 0.1f);
-  ESP_LOGI(TAG, "  wVacMaxSlowProtect [27.28]: %f V", emh1_get_16bit(18) * 0.1f);
-  ESP_LOGI(TAG, "  wFacMinSlowProtect [29.30]: %f Hz", emh1_get_16bit(20) * 0.01f);
-  ESP_LOGI(TAG, "  wFacMaxSlowProtect [31.32]: %f Hz", emh1_get_16bit(22) * 0.01f);
-  ESP_LOGI(TAG, "  wSafety [33.34]: %d", emh1_get_16bit(24));
-  // Supported safety values:
-  //
-  // 0: VDE0126
-  // 1: VDE4105
-  // 2: AS4777
-  // 3: G98
-  // 4: C10_11
-  // 5: TOR
-  // 6: EN50438_NL
-  // 7: Denmark2019_W
-  // 8: CEB
-  // 9: Cyprus2019
-  // 10: cNRS097_2_1
-  // 11: VDE0126_Greece
-  // 12: UTE_C15_712_Fr
-  // 13: IEC61727
-  // 14: G99
-  // 15: CQC
-  // 16: VDE0126_Greece_is
-  // 17: C15_712_Fr_island_50
-  // 18: C15_712_Fr_island_60
-  // 19: Guyana
-  // 20: MEA_Thailand
-  // 21: PEA_Thailand
-  // 22: cNewZealand
-  // 23: cIreland
-  // 24: cCE10_21
-  // 25: cRD1699
-  // 26: EN50438_Sweden
-  // 27: EN50549_PL
-  // 28: Czech PPDS
-  // 29: EN50438_Norway
-  // 30: EN50438_Portug
-  // 31: cCQC_WideRange
-  // 32: BRAZIL
-  // 33: EN50438_CEZ
-  // 34: IEC_Chile
-  // 35: Sri_Lanka
-  // 36: BRAZIL_240
-  // 37: EN50549-SK
-  // 38: EN50549_EU
-  // 39: G98/NI
-  // 40: Denmark2019_E
-  // 41: RD1699_island
-  ESP_LOGI(TAG, "  wPowerfactor_mode [35]: %d", data[26]);
-  ESP_LOGI(TAG, "  wPowerfactor_data [36]: %d", data[27]);
-  ESP_LOGI(TAG, "  wUpperLimit [37]: %d", data[28]);
-  ESP_LOGI(TAG, "  wLowerLimit [38]: %d", data[29]);
-  ESP_LOGI(TAG, "  wPowerLow [39]: %d", data[30]);
-  ESP_LOGI(TAG, "  wPowerUp [40]: %d", data[31]);
-  ESP_LOGI(TAG, "  Qpower_set [41.42]: %d", emh1_get_16bit(32));
-  ESP_LOGI(TAG, "  WFreqSetPoint [43.44]: %f Hz", emh1_get_16bit(34) * 0.01f);
-  ESP_LOGI(TAG, "  WFreqDropRate [45.46]: %d", emh1_get_16bit(36));
-  ESP_LOGI(TAG, "  QuVupRate [47.48]: %d", emh1_get_16bit(38));
-  ESP_LOGI(TAG, "  QuVlowRate [49.50]: %d", emh1_get_16bit(40));
-  ESP_LOGI(TAG, "  WPowerLimitsPercent [51.52]: %d", emh1_get_16bit(42));
-  ESP_LOGI(TAG, "  WWgra [53.54]: %f %%", emh1_get_16bit(44) * 0.01f);
-  ESP_LOGI(TAG, "  wWv2 [55.56]: %f V", emh1_get_16bit(46) * 0.1f);
-  ESP_LOGI(TAG, "  wWv3 [57.58]: %f V", emh1_get_16bit(48) * 0.1f);
-  ESP_LOGI(TAG, "  wWv4 [59.60]: %f V", emh1_get_16bit(50) * 0.1f);
-  ESP_LOGI(TAG, "  wQurangeV1 [61.62]: %d %%", emh1_get_16bit(52));
-  ESP_LOGI(TAG, "  wQurangeV4 [63.64]: %d %%", emh1_get_16bit(54));
-  ESP_LOGI(TAG, "  BVoltPowerLimit [65.66]: %d", emh1_get_16bit(56));
-  ESP_LOGI(TAG, "  WPowerManagerEnable [67.68]: %d", emh1_get_16bit(58));
-  ESP_LOGI(TAG, "  WGlobalSearchMPPTStartFlag [69.70]: %d", emh1_get_16bit(60));
-  ESP_LOGI(TAG, "  WFreqProtectRestrictive [71.72]: %d", emh1_get_16bit(62));
-  ESP_LOGI(TAG, "  WQuDelayTimer [73.74]: %d S", emh1_get_16bit(64));
-  ESP_LOGI(TAG, "  WFreqActivePowerDelayTimer [75.76]: %d ms", emh1_get_16bit(66));
 
   this->no_response_count_ = 0;
 }
