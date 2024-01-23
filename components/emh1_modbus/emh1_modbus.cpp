@@ -85,7 +85,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   }
 
   // Byte 9+data_len+1: CRC_HI (over all bytes)
-  // uint16_t computed_checksum = lrc(frame, 9 + data_len - 1);
+  uint16_t computed_checksum = 0; // removed checksum routine!
   uint16_t remote_checksum = uint16_t(frame[9 + data_len + 1]) | (uint16_t(frame[9 + data_len]) << 8);
   if (computed_checksum != remote_checksum) {
     ESP_LOGW(TAG, "Invalid checksum! 0x%02X !=  0x%02X", computed_checksum, remote_checksum);
@@ -176,16 +176,8 @@ void eMH1Modbus::register_address(uint8_t address) {
 
 void eMH1Modbus::discover_devices() {
   // broadcast query for serial number
-  static const char *const query = ":000300500008"
+  static const char *const query = ":000300500008";
   this->send(&query);
-}
-
-uint8_t lrc(char *value, uint8_t l) {
-  uint8_t lrc = 0;
-  for (int i = 0; i < l-1; i = i + 2) {
-    lrc -= Char2Int8(&value[i]);
-  }
-  return lrc;
 }
 
 uint8_t Char2Int8(char value[2]) {
@@ -214,6 +206,14 @@ char Int2Char(char c[2], uint8_t value) {
   c[0] = (highBits > 0x09)?(highBits+55):(highBits+48);
   c[1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
   return c;
+}
+
+uint8_t lrc(char *value, uint8_t l) {
+  uint8_t lrc = 0;
+  for (int i = 0; i < l-1; i = i + 2) {
+    lrc -= Char2Int8(&value[i]);
+  }
+  return lrc;
 }
 
 void eMH1Modbus::send(const char* bytes) {
