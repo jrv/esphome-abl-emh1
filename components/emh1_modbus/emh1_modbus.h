@@ -40,7 +40,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
 
  protected:
   bool parse_emh1_modbus_byte_(uint8_t byte);
-  GPIOPin *flow_control_pin_{"GPIO5"};
+  GPIOPin *flow_control_pin_{nullptr};
 
   std::vector<uint8_t> rx_buffer_;
   uint32_t last_emh1_modbus_byte_{0};
