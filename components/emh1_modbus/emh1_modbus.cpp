@@ -220,8 +220,8 @@ uint8_t int2char(uint16_t val, char* outStr, uint8_t offset) {
   uint8_t lowBits = (val & 0x0F00) >> 8;
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
   outStr[offset+1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
-  uint8_t highBits = (val & 0x00F0) >> 4;
-  uint8_t lowBits = (val & 0x000F);
+  highBits = (val & 0x00F0) >> 4;
+  lowBits = (val & 0x000F);
   outStr[offset+2] = (highBits > 0x09)?(highBits+55):(highBits+48);
   outStr[offset+3] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
 	return offset+4;
@@ -229,8 +229,8 @@ uint8_t int2char(uint16_t val, char* outStr, uint8_t offset) {
 
 uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
-    uint8_t highBits = (val & 0xF0) >> 4;
-    uint8_t lowBits = (val & 0x0F);
+    uint8_t highBits = (val[x] & 0xF0) >> 4;
+    uint8_t lowBits = (val[x] & 0x0F);
     outStr[2*x+offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
     outStr[2*x+offset+1] = (lowBits > 0x09)?(lowBits+55):(lowBits+48);
   }
