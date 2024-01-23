@@ -207,6 +207,8 @@ void eMH1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
+// TODO: kijk of het zonder de bovenste twee int2char definities kan?!
+
 uint8_t int2char(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
@@ -238,6 +240,7 @@ uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
 }
 
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
+  ESP_LOGVV(TAG, "TX -> Basics");
   // Send Modbus query as ASCII text (modbus-ascii !)
 	char buffer[200];
 	uint8_t size = 0;
