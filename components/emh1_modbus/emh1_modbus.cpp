@@ -1,6 +1,7 @@
 #include "emh1_modbus.h"
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
+#include "esphome.h"
 
 #define BROADCAST_ADDRESS 0xFF
 
@@ -10,10 +11,11 @@ namespace emh1_modbus {
 static const char *const TAG = "emh1_modbus";
 
 void eMH1Modbus::setup() {
-  if (this->flow_control_pin_ != nullptr) {
-    this->flow_control_pin_->setup();
-  }
-  ESP_LOGD(TAG, "Flow control pin setup");
+  // if (this->flow_control_pin_ != nullptr) {
+  //   this->flow_control_pin_->setup();
+  // }
+  // ESP_LOGD(TAG, "Flow control pin setup");
+	pinMode(5, OUTPUT);
 }
 
 void eMH1Modbus::loop() {
@@ -132,10 +134,9 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 }
 
 void eMH1Modbus::dump_config() {
-  ESP_LOGCONFIG(TAG, "eMH1Modbus:");
-  LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
-
-  this->check_uart_settings(38400);
+  // ESP_LOGCONFIG(TAG, "eMH1Modbus:");
+  // LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
+  // this->check_uart_settings(38400);
 }
 
 float eMH1Modbus::get_setup_priority() const {
@@ -261,14 +262,14 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(false);
+	digitalWrite(4, LOW);
+  // if (this->flow_control_pin_ != nullptr)
+  //  this->flow_control_pin_->digital_write(false);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
-  if (this->flow_control_pin_ != nullptr)
-    this->flow_control_pin_->digital_write(false);
-  ESP_LOGCONFIG(TAG, "eMH1Modbus:");
-  LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
+	digitalWrite(4, LOW);
+  // if (this->flow_control_pin_ != nullptr)
+  //   this->flow_control_pin_->digital_write(false);
 }
 
 }  // namespace emh1_modbus
