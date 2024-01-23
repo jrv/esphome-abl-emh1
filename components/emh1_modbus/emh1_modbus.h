@@ -32,6 +32,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
 
   float get_setup_priority() const override;
 
+  void send(const char* const*);
   void send(eMH1MessageT *tx_message);
   void query_status_report(uint8_t address);
   void query_device_info(uint8_t address);
