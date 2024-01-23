@@ -13,7 +13,7 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
     this->flow_control_pin_->setup();
   }
-  ESP_LOGD(TAG, "Flow control pin setup";
+  ESP_LOGD(TAG, "Flow control pin setup");
 }
 
 void eMH1Modbus::loop() {
