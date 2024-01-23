@@ -143,18 +143,18 @@ float eMH1Modbus::get_setup_priority() const {
 }
 
 void eMH1Modbus::query_status_report(uint8_t address) {
-  static const char *const query = ":0103002E0032";	
-  this->send(&query);
+  static const char query[] = ":0103002E0032";	
+  this->send(query);
 }
 
 void eMH1Modbus::query_device_info(uint8_t address) {
-  static const char *const query = ":0103002C0001";
-  this->send(&query);
+  static const char query[] = ":0103002C0001";
+  this->send(query);
 }
 
 void eMH1Modbus::query_config_settings(uint8_t address) {
-  static const char *const query = ":010300010002";
-  this->send(&query);
+  static const char query[] = ":010300010002";
+  this->send(query);
 }
 
 // void eMH1Modbus::register_address(uint8_t serial_number[14], uint8_t address) {
@@ -176,8 +176,8 @@ void eMH1Modbus::register_address(uint8_t address) {
 
 void eMH1Modbus::discover_devices() {
   // broadcast query for serial number
-  static const char *const query = ":000300500008";
-  this->send(&query);
+  static const char query[] = ":000300500008";
+  this->send(query);
 }
 
 uint8_t Char2Int8(char value[2]) {
@@ -218,7 +218,7 @@ uint8_t lrc(char *value, uint8_t l) {
   return lrc_;
 }
 
-void eMH1Modbus::send(const char *bytes) {
+void eMH1Modbus::send(const char bytes[]) {
   // Send Modbus query as ASCII text (modbus-ascii !)
 	uint8_t lrc_ = lrc(bytes, sizeof(bytes));
   if (this->flow_control_pin_ != nullptr)
