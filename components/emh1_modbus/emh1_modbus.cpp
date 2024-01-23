@@ -211,20 +211,20 @@ char Int2Char(char *c, uint8_t value) {
 */
 
 uint8_t lrc(char *value, uint8_t l) {
-  uint8_t lrc = 0;
+  uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
-    lrc -= Char2Int8(&value[i]);
+    lrc_ -= Char2Int8(&value[i]);
   }
-  return lrc;
+  return lrc_;
 }
 
-void eMH1Modbus::send(const char* bytes) {
+void eMH1Modbus::send(const char *bytes) {
   // Send Modbus query as ASCII text (modbus-ascii !)
-	uint8_t lrc = lrc(bytes, sizeof(bytes));
+	uint8_t lrc_ = lrc(bytes, sizeof(bytes));
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
   this->print(bytes);
-	this->print(lrc, HEX);
+	this->print(lrc_, HEX);
 	this->print("\r\n");
   this->flush();
   if (this->flow_control_pin_ != nullptr)
