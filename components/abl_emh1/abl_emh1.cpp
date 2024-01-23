@@ -21,7 +21,7 @@ static const std::string MODES[MODES_SIZE] = {
     "Self Test",        // 6
 };
 
-static const uint8_t ERRORS_SIZE = 12;
+static const uint8_t STATE_SIZE = 12;
 static const char *const STATE[STATE_SIZE] = {
 	"Waiting for EV",													// A1
 	"EV is asking for charging", 							// B1
@@ -126,45 +126,45 @@ void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
 
   ESP_LOGI(TAG, "Status frame received");
 
-  this->publish_state_(this->temperature_sensor_, (int16_t) emh1_get_16bit(0));
-  this->publish_state_(this->energy_today_sensor_, emh1_get_16bit(2) * 0.1f);
-  this->publish_state_(this->dc1_voltage_sensor_, emh1_get_16bit(4) * 0.1f);
-  this->publish_state_(this->dc2_voltage_sensor_, emh1_get_16bit(6) * 0.1f);
-  this->publish_state_(this->dc1_current_sensor_, emh1_get_16bit(8) * 0.1f);
-  this->publish_state_(this->dc2_current_sensor_, emh1_get_16bit(10) * 0.1f);
-  this->publish_state_(this->ac_current_sensor_, emh1_get_16bit(12) * 0.1f);
-  this->publish_state_(this->ac_voltage_sensor_, emh1_get_16bit(14) * 0.1f);
-  this->publish_state_(this->ac_frequency_sensor_, emh1_get_16bit(16) * 0.01f);
-  this->publish_state_(this->ac_power_sensor_, emh1_get_16bit(18));
+//  this->publish_state_(this->temperature_sensor_, (int16_t) emh1_get_16bit(0));
+//  this->publish_state_(this->energy_today_sensor_, emh1_get_16bit(2) * 0.1f);
+//  this->publish_state_(this->dc1_voltage_sensor_, emh1_get_16bit(4) * 0.1f);
+//  this->publish_state_(this->dc2_voltage_sensor_, emh1_get_16bit(6) * 0.1f);
+//  this->publish_state_(this->dc1_current_sensor_, emh1_get_16bit(8) * 0.1f);
+//  this->publish_state_(this->dc2_current_sensor_, emh1_get_16bit(10) * 0.1f);
+//  this->publish_state_(this->ac_current_sensor_, emh1_get_16bit(12) * 0.1f);
+//  this->publish_state_(this->ac_voltage_sensor_, emh1_get_16bit(14) * 0.1f);
+//  this->publish_state_(this->ac_frequency_sensor_, emh1_get_16bit(16) * 0.01f);
+//  this->publish_state_(this->ac_power_sensor_, emh1_get_16bit(18));
 
   // register 20 is not used
 
   uint32_t raw_energy_total = emh1_get_32bit(22);
   // The inverter publishes a zero once per day on boot-up. This confuses the energy dashboard.
   if (raw_energy_total > 0) {
-    this->publish_state_(this->energy_total_sensor_, raw_energy_total * 0.1f);
+    // this->publish_state_(this->energy_total_sensor_, raw_energy_total * 0.1f);
   }
 
   uint32_t raw_runtime_total = emh1_get_32bit(26);
   if (raw_runtime_total > 0) {
-    this->publish_state_(this->runtime_total_sensor_, (float) raw_runtime_total);
+    // this->publish_state_(this->runtime_total_sensor_, (float) raw_runtime_total);
   }
 
   uint8_t mode = (uint8_t) emh1_get_16bit(30);
-  this->publish_state_(this->mode_sensor_, mode);
-  this->publish_state_(this->mode_name_text_sensor_, (mode < MODES_SIZE) ? MODES[mode] : "Unknown");
+  // this->publish_state_(this->mode_sensor_, mode);
+  // this->publish_state_(this->mode_name_text_sensor_, (mode < MODES_SIZE) ? MODES[mode] : "Unknown");
 
-  this->publish_state_(this->grid_voltage_fault_sensor_, emh1_get_16bit(32) * 0.1f);
-  this->publish_state_(this->grid_frequency_fault_sensor_, emh1_get_16bit(34) * 0.01f);
-  this->publish_state_(this->dc_injection_fault_sensor_, emh1_get_16bit(36) * 0.001f);
-  this->publish_state_(this->temperature_fault_sensor_, (float) emh1_get_16bit(38));
-  this->publish_state_(this->pv1_voltage_fault_sensor_, emh1_get_16bit(40) * 0.1f);
-  this->publish_state_(this->pv2_voltage_fault_sensor_, emh1_get_16bit(42) * 0.1f);
-  this->publish_state_(this->gfc_fault_sensor_, emh1_get_16bit(44) * 0.001f);
+  ///this->publish_state_(this->grid_voltage_fault_sensor_, emh1_get_16bit(32) * 0.1f);
+  //this->publish_state_(this->grid_frequency_fault_sensor_, emh1_get_16bit(34) * 0.01f);
+  //this->publish_state_(this->dc_injection_fault_sensor_, emh1_get_16bit(36) * 0.001f);
+  //this->publish_state_(this->temperature_fault_sensor_, (float) emh1_get_16bit(38));
+  //this->publish_state_(this->pv1_voltage_fault_sensor_, emh1_get_16bit(40) * 0.1f);
+  //this->publish_state_(this->pv2_voltage_fault_sensor_, emh1_get_16bit(42) * 0.1f);
+  //this->publish_state_(this->gfc_fault_sensor_, emh1_get_16bit(44) * 0.001f);
 
   uint32_t error_bits = emh1_get_error_bitmask(46);
-  this->publish_state_(this->error_bits_sensor_, error_bits);
-  this->publish_state_(this->errors_text_sensor_, this->error_bits_to_string_(error_bits));
+  //this->publish_state_(this->error_bits_sensor_, error_bits);
+  //this->publish_state_(this->errors_text_sensor_, this->error_bits_to_string_(error_bits));
 
   if (data.size() > 50) {
     ESP_LOGD(TAG, "  CT Pgrid: %d W", emh1_get_16bit(50));
@@ -174,25 +174,25 @@ void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
 }
 
 void ABLeMH1::publish_device_offline_() {
-  this->publish_state_(this->mode_sensor_, -1);
-  this->publish_state_(this->mode_name_text_sensor_, "Offline");
-
-  this->publish_state_(this->temperature_sensor_, NAN);
-  this->publish_state_(this->dc1_voltage_sensor_, 0);
-  this->publish_state_(this->dc2_voltage_sensor_, 0);
-  this->publish_state_(this->dc1_current_sensor_, 0);
-  this->publish_state_(this->dc2_current_sensor_, 0);
-  this->publish_state_(this->ac_current_sensor_, 0);
-  this->publish_state_(this->ac_voltage_sensor_, NAN);
-  this->publish_state_(this->ac_frequency_sensor_, NAN);
-  this->publish_state_(this->ac_power_sensor_, 0);
-  this->publish_state_(this->grid_voltage_fault_sensor_, NAN);
-  this->publish_state_(this->grid_frequency_fault_sensor_, NAN);
-  this->publish_state_(this->dc_injection_fault_sensor_, NAN);
-  this->publish_state_(this->temperature_fault_sensor_, NAN);
-  this->publish_state_(this->pv1_voltage_fault_sensor_, NAN);
-  this->publish_state_(this->pv2_voltage_fault_sensor_, NAN);
-  this->publish_state_(this->gfc_fault_sensor_, NAN);
+//  this->publish_state_(this->mode_sensor_, -1);
+//  this->publish_state_(this->mode_name_text_sensor_, "Offline");
+//
+//  this->publish_state_(this->temperature_sensor_, NAN);
+//  this->publish_state_(this->dc1_voltage_sensor_, 0);
+//  this->publish_state_(this->dc2_voltage_sensor_, 0);
+//  this->publish_state_(this->dc1_current_sensor_, 0);
+//  this->publish_state_(this->dc2_current_sensor_, 0);
+//  this->publish_state_(this->ac_current_sensor_, 0);
+//  this->publish_state_(this->ac_voltage_sensor_, NAN);
+//  this->publish_state_(this->ac_frequency_sensor_, NAN);
+//  this->publish_state_(this->ac_power_sensor_, 0);
+//  this->publish_state_(this->grid_voltage_fault_sensor_, NAN);
+//  this->publish_state_(this->grid_frequency_fault_sensor_, NAN);
+//  this->publish_state_(this->dc_injection_fault_sensor_, NAN);
+//  this->publish_state_(this->temperature_fault_sensor_, NAN);
+//  this->publish_state_(this->pv1_voltage_fault_sensor_, NAN);
+//  this->publish_state_(this->pv2_voltage_fault_sensor_, NAN);
+//  this->publish_state_(this->gfc_fault_sensor_, NAN);
 }
 
 void ABLeMH1::update() {
@@ -227,29 +227,29 @@ void ABLeMH1::publish_state_(text_sensor::TextSensor *text_sensor, const std::st
 void ABLeMH1::dump_config() {
   ESP_LOGCONFIG(TAG, "ABLeMH1:");
   ESP_LOGCONFIG(TAG, "  Address: 0x%02X", this->address_);
-  LOG_SENSOR("", "Temperature", this->temperature_sensor_);
-  LOG_SENSOR("", "Energy today", this->energy_today_sensor_);
-  LOG_SENSOR("", "DC1 voltage", this->dc1_voltage_sensor_);
-  LOG_SENSOR("", "DC2 voltage", this->dc2_voltage_sensor_);
-  LOG_SENSOR("", "DC1 current", this->dc1_current_sensor_);
-  LOG_SENSOR("", "DC2 current", this->dc2_current_sensor_);
-  LOG_SENSOR("", "AC current", this->ac_current_sensor_);
-  LOG_SENSOR("", "AC voltage", this->ac_voltage_sensor_);
-  LOG_SENSOR("", "AC frequency", this->ac_frequency_sensor_);
-  LOG_SENSOR("", "AC power", this->ac_power_sensor_);
-  LOG_SENSOR("", "Energy total", this->energy_total_sensor_);
-  LOG_SENSOR("", "Runtime total", this->runtime_total_sensor_);
-  LOG_SENSOR("", "Mode", this->mode_sensor_);
-  LOG_SENSOR("", "Error bits", this->error_bits_sensor_);
-  LOG_SENSOR("", "Grid voltage fault", this->grid_voltage_fault_sensor_);
-  LOG_SENSOR("", "Grid frequency fault", this->grid_frequency_fault_sensor_);
-  LOG_SENSOR("", "DC injection fault", this->dc_injection_fault_sensor_);
-  LOG_SENSOR("", "Temperature fault", this->temperature_fault_sensor_);
-  LOG_SENSOR("", "PV1 voltage fault", this->pv1_voltage_fault_sensor_);
-  LOG_SENSOR("", "PV2 voltage fault", this->pv2_voltage_fault_sensor_);
-  LOG_SENSOR("", "GFC fault", this->gfc_fault_sensor_);
-  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_name_text_sensor_);
-  LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
+//  LOG_SENSOR("", "Temperature", this->temperature_sensor_);
+//  LOG_SENSOR("", "Energy today", this->energy_today_sensor_);
+//  LOG_SENSOR("", "DC1 voltage", this->dc1_voltage_sensor_);
+//  LOG_SENSOR("", "DC2 voltage", this->dc2_voltage_sensor_);
+//  LOG_SENSOR("", "DC1 current", this->dc1_current_sensor_);
+//  LOG_SENSOR("", "DC2 current", this->dc2_current_sensor_);
+//  LOG_SENSOR("", "AC current", this->ac_current_sensor_);
+//  LOG_SENSOR("", "AC voltage", this->ac_voltage_sensor_);
+//  LOG_SENSOR("", "AC frequency", this->ac_frequency_sensor_);
+//  LOG_SENSOR("", "AC power", this->ac_power_sensor_);
+//  LOG_SENSOR("", "Energy total", this->energy_total_sensor_);
+//  LOG_SENSOR("", "Runtime total", this->runtime_total_sensor_);
+//  LOG_SENSOR("", "Mode", this->mode_sensor_);
+//  LOG_SENSOR("", "Error bits", this->error_bits_sensor_);
+//  LOG_SENSOR("", "Grid voltage fault", this->grid_voltage_fault_sensor_);
+//  LOG_SENSOR("", "Grid frequency fault", this->grid_frequency_fault_sensor_);
+//  LOG_SENSOR("", "DC injection fault", this->dc_injection_fault_sensor_);
+//  LOG_SENSOR("", "Temperature fault", this->temperature_fault_sensor_);
+//  LOG_SENSOR("", "PV1 voltage fault", this->pv1_voltage_fault_sensor_);
+//  LOG_SENSOR("", "PV2 voltage fault", this->pv2_voltage_fault_sensor_);
+//  LOG_SENSOR("", "GFC fault", this->gfc_fault_sensor_);
+//  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_name_text_sensor_);
+//  LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
 }
 
 std::string ABLeMH1::error_bits_to_string_(const uint32_t mask) {
