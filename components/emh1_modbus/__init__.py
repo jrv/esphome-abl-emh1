@@ -59,8 +59,7 @@ def emh1_modbus_device_schema(default_address):
         schema[cv.Required(CONF_ADDRESS)] = cv.hex_uint8_t
     else:
         schema[cv.Optional(CONF_ADDRESS, default=default_address)] = cv.hex_uint8_t
-   return cv.Schema(schema)
-
+    return cv.Schema(schema)
 
 async def register_emh1_modbus_device(var, config):
     parent = await cg.get_variable(config[CONF_EMH1_MODBUS_ID])
