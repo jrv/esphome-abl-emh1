@@ -43,10 +43,15 @@ uint8_t ascii2uint8(const char* value) {
 }
 
 uint8_t lrc(const char* value, uint8_t l) {
+	char buffer[100];
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
+		buffer[i] = value[i];
   }
+	buffer[i++] = '\r';
+	buffer[i++] = '\n\;'
+	ESP_LOGD(TAG, "LRC checked over: %s", buffer);
   return lrc_;
 }
 
@@ -69,7 +74,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		  return false;
 	}
 	// check LRC
-	uint8_t lrc1 = ascii2uint8(&frame[at-4]);
+	uint8_t lrc1 = ascii2uint8(&frame[at-3]);
   uint8_t lrc2 = lrc(&frame[1], at-5);
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
