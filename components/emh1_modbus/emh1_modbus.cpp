@@ -248,6 +248,8 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	size = int2char(tx_message->FunctionCode, buffer, size);
 	size = int2char(tx_message->Destination, buffer, size);
 	size = int2char(tx_message->DataLength, buffer, size);
+	ESP_LOGW(TAG, "TEST DEST %s", hexencode_plain(tx_message->Destination, size).c_str());
+
 	if (tx_message->FunctionCode == 0x03) {
 		tx_message->LRC = lrc(buffer, size);
 	  size = int2char(tx_message->LRC, buffer, size);
