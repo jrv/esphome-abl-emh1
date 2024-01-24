@@ -46,7 +46,7 @@ uint8_t lrc(const char* value, uint8_t l) {
 	char buffer[100];
   uint8_t lrc_ = 0;
   cnt = 0;
-  for (i = 0; i < l-1; i = i + 2) {
+  for (int i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
 		buffer[cnt++] = value[i];
   }
