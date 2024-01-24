@@ -162,7 +162,7 @@ uint16_t char2int16(char value[4]) {
 uint8_t lrc(char *value, uint8_t l) {
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
-    lrc_ -= char2int8(&value[i]);
+    lrc_ -= ascii2uint8(&value[i]);
   }
   return lrc_;
 }
