@@ -41,7 +41,7 @@ static const char * const STATECODE[STATE_SIZE] = {
 	"E0", "E1", "E2", "E3", "F1", "F2"
 };
 
-void ABLeMH1::on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) {
+void ABLeMH1::on_emh1_modbus_data(const uint16_t &function, const uint16_t &datalength, const std::vector<uint8_t> &data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
       this->decode_device_info_(data);

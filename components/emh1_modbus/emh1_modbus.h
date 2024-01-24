@@ -13,7 +13,7 @@ struct eMH1MessageT {
 	uint16_t DataLength;
 	uint8_t LRC;
 	uint8_t WriteBytes;
-	uint8_t WriteData[100];
+	uint8_t Data[100];
 };
 
 class eMH1ModbusDevice;

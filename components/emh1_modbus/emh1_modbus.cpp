@@ -71,13 +71,14 @@ uint8_t lrc(const char* value, uint8_t l) {
 }
 
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
-  size_t at = this->rx_buffer_.size();
+  if (byte != 0x0A) // 0x0A == LF == End of transmission
+	  return true;
+	size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   char *frame = &this->rx_buffer_[0];
-	if (byte != 0x0A) // 0x0A == LF == End of transmission
-	  return true;
-	
-	// check contents of first byte
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+
+		// check contents of first byte
 	switch (frame[0]) {
 	  case ':':
    	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
@@ -116,7 +117,16 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	  case 0x03:
       ESP_LOGD(TAG, "Response to read operation");
 			r = ascii2uint8(&frame[5]);
-	    ESP_LOGD(TAG, "Receiving 0x%02X bytes", r);
+	    ESP_LOGD(TAG, "Receiving %u bytes", r);
+			if (r == tx_message->DataLength * 2) {
+				ESP_LOGD(TAG, "Send data upwards");
+				for (uint8_t x = 0; x<r; x++) {
+				  this->tx_message->Data[x] = ascii2uint8(frame[7+x*2]);
+				}
+        device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
+			} else {
+				ESP_LOGW(TAG, "Response data size mismatch, expected %u got %u bytes", this->emh1_tx_message.DataLength * 2, r);
+			}
 			break;
 		case 0x10:
       ESP_LOGD(TAG, "Response to write operation");
@@ -218,7 +228,7 @@ void eMH1Modbus::query_status_report(uint8_t address) {
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
 	tx_message->Destination = 0x002E;
-	tx_message->DataLength = 0x0032;
+	tx_message->DataLength = 0x0005;
   this->send();
 }
 
