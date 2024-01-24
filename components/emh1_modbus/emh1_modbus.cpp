@@ -46,6 +46,11 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const char *frame = &this->rx_buffer_[0];
+	if (byte == 0x0A) {
+      ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
+			return false;
+	}
+	return true;
 
   // Byte 0: modbus address digit 1 (match all)
   if (at == 0)
