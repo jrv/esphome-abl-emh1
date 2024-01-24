@@ -80,7 +80,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   uint8_t lrc2 = lrc(&frame[1], at-3);
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
-		return false;
+		// return false;
 	}
 
   // Byte 1: modbus address digit 2 (check address)
