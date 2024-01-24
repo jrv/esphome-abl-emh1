@@ -125,7 +125,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 				}
   			bool found = false;
   			for (auto *device : this->devices_) {
-				  ESP_LOGW("list device: 0x%02X", device->address);
+				  ESP_LOGW("list device: 0x%02X", device->address_);
     		  if (device->address_ == tx_message->DeviceId) {
             device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
 						found = true;
