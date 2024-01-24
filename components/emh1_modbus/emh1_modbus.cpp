@@ -34,19 +34,33 @@ void eMH1Modbus::loop() {
   }
 }
 
+uint8_t ascii2uint8(char* value) {
+  char c1 = value[0];
+  uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
+  char c2 = value[1];
+  uint8_t lowBits = (c2 > '9')?(c2-55):(c2-48);
+  return (highBits << 4 | lowBits);
+}
+
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
-  ESP_LOGD(TAG, "Incoming Byte");
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
-  const uint8_t *frame = &this->rx_buffer_[0];
+  const char *frame = &this->rx_buffer_[0];
 
-  // Byte 0: modbus address (match all)
+  // Byte 0: modbus address digit 1 (match all)
   if (at == 0)
     return true;
 
-  // Byte 1: Function (msb indicates error)
-  if (at == 1)
-    return (byte & 0x80) != 0x80;
+  // Byte 1: modbus address digit 2 (check address)
+  if (at == 1) {
+	  uint8_t r = ascii2uint8(frame, 2);
+	  if (r == 0x01) {
+	    ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
+		  return true;
+	  } else {
+	    ESP_LOGD(TAG, "ERROR: Received from device ID: 0x%02X", r);
+			return false;
+		}
 
   if (at == 2)
     return true;
@@ -130,14 +144,6 @@ void eMH1Modbus::dump_config() {
 float eMH1Modbus::get_setup_priority() const {
   // After UART bus
   return setup_priority::BUS - 1.0f;
-}
-
-uint8_t char2int8(char value[2]) {
-  char c1 = value[0];
-  uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
-  char c2 = value[1];
-  uint8_t lowBits = (c2 > '9')?(c2-55):(c2-48);
-  return (highBits << 4 | lowBits);
 }
 
 uint16_t char2int16(char value[4]) {
