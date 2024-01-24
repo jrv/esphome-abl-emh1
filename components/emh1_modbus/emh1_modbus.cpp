@@ -101,7 +101,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	  case 0x90:
       ESP_LOGW(TAG, "Error response");
 			break;
-		case default:
+		default:
       ESP_LOGW(TAG, "Unknown response type");
   }
 	return true;
