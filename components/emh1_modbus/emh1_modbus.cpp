@@ -274,7 +274,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
   this->flush();
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
-	const uint32_t now = millis();
+	uint32_t now = millis();
   this->rx_buffer_.clear();
   while (now - this->last_emh1_modbus_byte_ < 100) {
   	while (this->available()) {
