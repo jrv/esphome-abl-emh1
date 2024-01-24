@@ -53,7 +53,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 
   // Byte 1: modbus address digit 2 (check address)
   if (at == 1) {
-	  uint8_t r = ascii2uint8(frame);
+	  uint8_t r = ascii2uint8(&frame);
 	  if (r == 0x01) {
 	    ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
 		  return true;
@@ -61,6 +61,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	    ESP_LOGD(TAG, "ERROR: Received from device ID: 0x%02X", r);
 			return false;
 		}
+  }
 
   if (at == 2)
     return true;
