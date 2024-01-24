@@ -76,9 +76,9 @@ void ABLeMH1::decode_config_settings_(const uint8_t* data) {
   //  return;
   //}
 
-  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
-    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
-  };
+//  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
+//    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+//  };
 
   ESP_LOGI(TAG, "Config settings frame received");
   //ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
@@ -109,15 +109,15 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
     //return;
   //}
 
-  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
-    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
-  };
-  auto emh1_get_32bit = [&](size_t i) -> uint32_t {
-    return uint32_t((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
-  };
-  auto emh1_get_error_bitmask = [&](size_t i) -> uint32_t {
-    return uint32_t((data[i + 3] << 24) | (data[i + 2] << 16) | (data[i + 1] << 8) | data[i]);
-  };
+//  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
+//    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
+//  };
+//  auto emh1_get_32bit = [&](size_t i) -> uint32_t {
+//    return uint32_t((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
+//  };
+//  auto emh1_get_error_bitmask = [&](size_t i) -> uint32_t {
+//    return uint32_t((data[i + 3] << 24) | (data[i + 2] << 16) | (data[i + 1] << 8) | data[i]);
+//  };
 
   ESP_LOGI(TAG, "Status frame received");
 
@@ -134,18 +134,18 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
 
   // register 20 is not used
 
-  uint32_t raw_energy_total = emh1_get_32bit(22);
+//  uint32_t raw_energy_total = emh1_get_32bit(22);
   // The inverter publishes a zero once per day on boot-up. This confuses the energy dashboard.
-  if (raw_energy_total > 0) {
+//  if (raw_energy_total > 0) {
     // this->publish_state_(this->energy_total_sensor_, raw_energy_total * 0.1f);
-  }
+//  }
 
-  uint32_t raw_runtime_total = emh1_get_32bit(26);
-  if (raw_runtime_total > 0) {
+//  uint32_t raw_runtime_total = emh1_get_32bit(26);
+//  if (raw_runtime_total > 0) {
     // this->publish_state_(this->runtime_total_sensor_, (float) raw_runtime_total);
-  }
+//  }
 
-  uint8_t mode = (uint8_t) emh1_get_16bit(30);
+ // uint8_t mode = (uint8_t) emh1_get_16bit(30);
   // this->publish_state_(this->mode_sensor_, mode);
   // this->publish_state_(this->mode_name_text_sensor_, (mode < MODES_SIZE) ? MODES[mode] : "Unknown");
 
@@ -157,13 +157,13 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
   //this->publish_state_(this->pv2_voltage_fault_sensor_, emh1_get_16bit(42) * 0.1f);
   //this->publish_state_(this->gfc_fault_sensor_, emh1_get_16bit(44) * 0.001f);
 
-  uint32_t error_bits = emh1_get_error_bitmask(46);
+//  uint32_t error_bits = emh1_get_error_bitmask(46);
   //this->publish_state_(this->error_bits_sensor_, error_bits);
   //this->publish_state_(this->errors_text_sensor_, this->error_bits_to_string_(error_bits));
 
-  if (data.size() > 50) {
-    ESP_LOGD(TAG, "  CT Pgrid: %d W", emh1_get_16bit(50));
-  }
+//  if (data.size() > 50) {
+//    ESP_LOGD(TAG, "  CT Pgrid: %d W", emh1_get_16bit(50));
+//  }
 
   this->no_response_count_ = 0;
 }
