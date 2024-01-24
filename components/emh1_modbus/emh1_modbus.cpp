@@ -20,7 +20,8 @@ void eMH1Modbus::loop() {
   delay(1000);
 }
 
-void readData() {
+/*
+void eMH1Modbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_emh1_modbus_byte_ > 50) {
     this->rx_buffer_.clear();
@@ -37,6 +38,7 @@ void readData() {
     }
   }
 }
+*/
 
 uint8_t ascii2uint8(const char* value) {
   char c1 = value[0];
