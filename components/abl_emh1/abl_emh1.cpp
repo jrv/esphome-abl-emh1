@@ -44,13 +44,13 @@ static const char * const STATECODE[STATE_SIZE] = {
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
-      this->decode_device_info_(&data);
+      this->decode_device_info_(data);
       break;
     case FUNCTION_STATUS_REPORT:
-      this->decode_status_report_(&data);
+      this->decode_status_report_(data);
       break;
     case FUNCTION_CONFIG_SETTINGS:
-      this->decode_config_settings_(&data);
+      this->decode_config_settings_(data);
       break;
     default:
       // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
