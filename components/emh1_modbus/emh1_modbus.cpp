@@ -17,11 +17,6 @@ void eMH1Modbus::setup() {
 }
 
 void eMH1Modbus::loop() {
-  delay(1000);
-}
-
-/*
-void eMH1Modbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_emh1_modbus_byte_ > 50) {
     this->rx_buffer_.clear();
@@ -38,7 +33,6 @@ void eMH1Modbus::loop() {
     }
   }
 }
-*/
 
 uint8_t ascii2uint8(const char* value) {
   char c1 = value[0];
@@ -274,6 +268,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
   this->flush();
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
+	/*
 	uint32_t now = millis();
   this->rx_buffer_.clear();
   while (now - this->last_emh1_modbus_byte_ < 100) {
@@ -288,6 +283,7 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
     }
 		now = millis();
   }
+	*/
 }
 
 }  // namespace emh1_modbus
