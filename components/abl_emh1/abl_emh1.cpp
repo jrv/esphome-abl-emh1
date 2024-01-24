@@ -54,7 +54,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
       this->decode_config_settings_(data);
       break;
     case FUNCTION_DISCOVER_DEVICES:
-      this->decode_serialnumber_(data);
+      this->decode_serial_number_(data);
       break;
     default:
       // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
