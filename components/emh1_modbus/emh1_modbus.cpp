@@ -71,10 +71,10 @@ uint8_t lrc(const char* value, uint8_t l) {
 }
 
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
-  if (byte != 0x0A) // 0x0A == LF == End of transmission
-	  return true;
 	size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
+  if (byte != 0x0A) // 0x0A == LF == End of transmission
+	  return true;
   char *frame = &this->rx_buffer_[0];
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 
