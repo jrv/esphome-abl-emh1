@@ -42,7 +42,7 @@ uint8_t ascii2uint8(const char* value) {
   return (highBits << 4 | lowBits);
 }
 
-uint8_t lrc(char *value, uint8_t l) {
+uint8_t lrc(const char* value, uint8_t l) {
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
@@ -53,7 +53,7 @@ uint8_t lrc(char *value, uint8_t l) {
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
-  const char *frame = &this->rx_buffer_[0];
+  char *frame = &this->rx_buffer_[0];
 	if (byte != 0x0A) // 0x0A == LF == End of transmission
 	  return true;
 	// check contents of first byte
