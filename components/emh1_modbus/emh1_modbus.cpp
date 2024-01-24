@@ -34,7 +34,7 @@ void eMH1Modbus::loop() {
   }
 }
 
-uint8_t ascii2uint8(char* value) {
+uint8_t ascii2uint8(const char* value) {
   char c1 = value[0];
   uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
   char c2 = value[1];
@@ -53,7 +53,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 
   // Byte 1: modbus address digit 2 (check address)
   if (at == 1) {
-	  uint8_t r = ascii2uint8(&frame);
+	  uint8_t r = ascii2uint8(frame);
 	  if (r == 0x01) {
 	    ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
 		  return true;
