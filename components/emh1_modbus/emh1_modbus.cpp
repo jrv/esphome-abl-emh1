@@ -109,7 +109,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		case 0x10:
       ESP_LOGD(TAG, "Response to write operation");
       // Read eMH1 starting address
-	    v = ascii2uint16(&frame[5];
+	    v = ascii2uint16(&frame[5]);
 	    ESP_LOGD(TAG, "Starting address: 0x%04X", v);
 			break;
 	  case 0x90:
