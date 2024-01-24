@@ -44,16 +44,17 @@ static const char * const STATECODE[STATE_SIZE] = {
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
-      this->decode_device_info_(data);
+      this->decode_device_info_(&data);
       break;
     case FUNCTION_STATUS_REPORT:
-      this->decode_status_report_(data);
+      this->decode_status_report_(&data);
       break;
     case FUNCTION_CONFIG_SETTINGS:
-      this->decode_config_settings_(data);
+      this->decode_config_settings_(&data);
       break;
     default:
-      ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+      // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+      ESP_LOGW(TAG, "Unhandled ABL frame");
   }
 }
 
@@ -105,8 +106,8 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
     //              "https://github.com/syssi/esphome-solax-x1-mini/issues");
     //ESP_LOGW(TAG, "Please provide the following status response data: %s",
     //         format_hex_pretty(&data.front(), data.size()).c_str());
-    return;
-  }
+    //return;
+  //}
 
   auto emh1_get_16bit = [&](size_t i) -> uint16_t {
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
