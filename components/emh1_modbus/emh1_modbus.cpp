@@ -94,10 +94,13 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	switch(r) {
 	  case 0x03:
       ESP_LOGD(TAG, "Response to read operation");
-		case 0x10;
+			break;
+		case 0x10:
       ESP_LOGD(TAG, "Response to write operation");
-	  case 0x90;
+			break;
+	  case 0x90:
       ESP_LOGW(TAG, "Error response");
+			break;
 		case default:
       ESP_LOGW(TAG, "Unknown response type");
   }
