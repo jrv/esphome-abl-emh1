@@ -57,44 +57,38 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
   }
 }
 
-void ABLeMH1::decode_device_info_(const std::vector<uint8_t> &data) {
-  if (data.size() != 58) {
-    ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
-    return;
-  }
-
+void ABLeMH1::decode_device_info_(const uint8_t* data) {
   ESP_LOGI(TAG, "Device info frame received");
-  ESP_LOGI(TAG, "  Device type: %d", data[0]);
-  ESP_LOGI(TAG, "  Rated power: %s", std::string(data.begin() + 1, data.begin() + 1 + 6).c_str());
-  ESP_LOGI(TAG, "  Firmware version: %s", std::string(data.begin() + 7, data.begin() + 7 + 5).c_str());
-  ESP_LOGI(TAG, "  Module name: %s", std::string(data.begin() + 12, data.begin() + 12 + 14).c_str());
-  ESP_LOGI(TAG, "  Manufacturer: %s", std::string(data.begin() + 26, data.begin() + 26 + 14).c_str());
-  ESP_LOGI(TAG, "  Serial number: %s", std::string(data.begin() + 40, data.begin() + 40 + 14).c_str());
-  ESP_LOGI(TAG, "  Rated bus voltage: %s", std::string(data.begin() + 54, data.begin() + 54 + 4).c_str());
-
+  //ESP_LOGI(TAG, "  Device type: %d", data[0]);
+  //ESP_LOGI(TAG, "  Rated power: %s", std::string(data.begin() + 1, data.begin() + 1 + 6).c_str());
+  //ESP_LOGI(TAG, "  Firmware version: %s", std::string(data.begin() + 7, data.begin() + 7 + 5).c_str());
+  //ESP_LOGI(TAG, "  Module name: %s", std::string(data.begin() + 12, data.begin() + 12 + 14).c_str());
+  //ESP_LOGI(TAG, "  Manufacturer: %s", std::string(data.begin() + 26, data.begin() + 26 + 14).c_str());
+  //ESP_LOGI(TAG, "  Serial number: %s", std::string(data.begin() + 40, data.begin() + 40 + 14).c_str());
+  //ESP_LOGI(TAG, "  Rated bus voltage: %s", std::string(data.begin() + 54, data.begin() + 54 + 4).c_str());
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_config_settings_(const std::vector<uint8_t> &data) {
-  if (data.size() != 68) {
-    ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
-    return;
-  }
+void ABLeMH1::decode_config_settings_(const uint8_t* data) {
+  //if (data.size() != 68) {
+  //  ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
+  //  return;
+  //}
 
   auto emh1_get_16bit = [&](size_t i) -> uint16_t {
     return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
   };
 
   ESP_LOGI(TAG, "Config settings frame received");
-  ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
-  ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", emh1_get_16bit(2));
-  ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", emh1_get_16bit(4) * 0.1f);
+  //ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
+  //ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", emh1_get_16bit(2));
+  //ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", emh1_get_16bit(4) * 0.1f);
 
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
-  if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
+void ABLeMH1::decode_status_report_(const uint8_t* data) {
+  //if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
     // Solax X1 mini status report (data_len 0x34: 52 bytes):
     // AA.55.00.0A.01.00.11.82.34.00.1A.00.02.00.00.00.00.00.00.00.00.00.00.09.21.13.87.00.00.FF.FF.
     // 00.00.00.12.00.00.00.15.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.04.D6
@@ -106,11 +100,11 @@ void ABLeMH1::decode_status_report_(const std::vector<uint8_t> &data) {
     // Solax X1 mini g3 status report (data_len 0x38: 56 bytes):
     // AA.55.00.0A.01.00.11.82.38.00.1A.00.03.04.0C.00.00.00.19.00.00.00.0B.08.FC.13.8A.00.F8.FF.FF.
     // 00.00.00.2B.00.00.00.0D.00.02.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.8A.00.DE.08.5F
-    ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
-    ESP_LOGW(TAG, "Your device is probably not supported. Please create an issue here: "
-                  "https://github.com/syssi/esphome-solax-x1-mini/issues");
-    ESP_LOGW(TAG, "Please provide the following status response data: %s",
-             format_hex_pretty(&data.front(), data.size()).c_str());
+    //ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
+    //ESP_LOGW(TAG, "Your device is probably not supported. Please create an issue here: "
+    //              "https://github.com/syssi/esphome-solax-x1-mini/issues");
+    //ESP_LOGW(TAG, "Please provide the following status response data: %s",
+    //         format_hex_pretty(&data.front(), data.size()).c_str());
     return;
   }
 
