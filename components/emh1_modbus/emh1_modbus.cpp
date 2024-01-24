@@ -42,23 +42,38 @@ uint8_t ascii2uint8(const char* value) {
   return (highBits << 4 | lowBits);
 }
 
+uint8_t lrc(char *value, uint8_t l) {
+  uint8_t lrc_ = 0;
+  for (int i = 0; i < l-1; i = i + 2) {
+    lrc_ -= ascii2uint8(&value[i]);
+  }
+  return lrc_;
+}
+
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const char *frame = &this->rx_buffer_[0];
-	if (byte == 0x0A) { // 0x0A == LF == End of transmission
-	    // check contents of first byte
-			switch (frame[0]) {
-		    case ':':
-      	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
-				  return false;
-				case '>':
-      	  ESP_LOGD(TAG, "Received client transmission: %s", frame);
-					return false;
-				default:
-          ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
-				  return false;
-			}
+	if (byte != 0x0A) // 0x0A == LF == End of transmission
+	  return true;
+	// check contents of first byte
+	switch (frame[0]) {
+	  case ':':
+   	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
+		  return false;
+		case '>':
+    	ESP_LOGD(TAG, "Received client transmission: %s", frame);
+			break;
+		default:
+      ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
+		  return false;
+	}
+	// check LRC
+	uint8_t lrc1 = ascii2uint8(frame[at-4]);
+  uint8_t lrc2 = lrc(frame[1], at-5);
+	if (lrc1 != lrc2) {
+		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
+		return false;
 	}
 	return true;
 
@@ -174,14 +189,6 @@ uint16_t char2int16(char value[4]) {
   return res;
 }
 
-uint8_t lrc(char *value, uint8_t l) {
-  uint8_t lrc_ = 0;
-  for (int i = 0; i < l-1; i = i + 2) {
-    lrc_ -= ascii2uint8(&value[i]);
-  }
-  return lrc_;
-}
-
 void eMH1Modbus::query_status_report(uint8_t address) {
   static eMH1MessageT tx_message;
 	tx_message.DeviceId = 0x01;
@@ -271,29 +278,13 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
-  ESP_LOGW(TAG, "TX -> %s", buffer);
+  ESP_LOGD(TAG, "TX -> %s", buffer);
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(false);
-	/*
-	uint32_t now = millis();
-  this->rx_buffer_.clear();
-  while (now - this->last_emh1_modbus_byte_ < 100) {
-  	while (this->available()) {
-      uint8_t byte;
-      this->read_byte(&byte);
-      if (this->parse_emh1_modbus_byte_(byte)) {
-        this->last_emh1_modbus_byte_ = now;
-      } else {
-        this->rx_buffer_.clear();
-      }
-    }
-		now = millis();
-  }
-	*/
 }
 
 }  // namespace emh1_modbus
