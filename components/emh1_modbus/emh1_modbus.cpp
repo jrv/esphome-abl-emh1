@@ -51,7 +51,7 @@ uint8_t lrc(const char* value, uint8_t l) {
 		buffer[cnt++] = value[i];
   }
 	buffer[cnt++] = '\r';
-	buffer[cnt++] = '\n\;'
+	buffer[cnt++] = '\n';
 	ESP_LOGD(TAG, "LRC checked over: %s", buffer);
   return lrc_;
 }
