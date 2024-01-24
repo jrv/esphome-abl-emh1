@@ -35,6 +35,7 @@ void eMH1Modbus::loop() {
 }
 
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
+  ESP_LOGD(TAG, "Incoming Byte");
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const uint8_t *frame = &this->rx_buffer_[0];
@@ -196,9 +197,9 @@ void eMH1Modbus::discover_devices() {
   this->send(&tx_message);
 }
 
-// TODO: kijk of het zonder de bovenste twee int2char definities kan?!
+// TODO: kijk of het zonder de bovenste twee hexencode_ascii definities kan?!
 
-uint8_t int2char(uint8_t val, char* outStr, uint8_t offset) {
+uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -206,7 +207,7 @@ uint8_t int2char(uint8_t val, char* outStr, uint8_t offset) {
 	return offset+2;
 }
 
-uint8_t int2char(uint16_t val, char* outStr, uint8_t offset) {
+uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF000) >> 12;
   uint8_t lowBits = (val & 0x0F00) >> 8;
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -218,7 +219,7 @@ uint8_t int2char(uint16_t val, char* outStr, uint8_t offset) {
 	return offset+4;
 }
 
-uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
+uint8_t hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val[x] & 0xF0) >> 4;
     uint8_t lowBits = (val[x] & 0x0F);
@@ -233,18 +234,18 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	char buffer[200];
 	uint8_t size = 0;
 	buffer[size++] = ':';
-	size = int2char(tx_message->DeviceId, buffer, size);
-	size = int2char(tx_message->FunctionCode, buffer, size);
-	size = int2char(tx_message->Destination, buffer, size);
-	size = int2char(tx_message->DataLength, buffer, size);
+	size = hexencode_ascii(tx_message->DeviceId, buffer, size);
+	size = hexencode_ascii(tx_message->FunctionCode, buffer, size);
+	size = hexencode_ascii(tx_message->Destination, buffer, size);
+	size = hexencode_ascii(tx_message->DataLength, buffer, size);
 
 	if (tx_message->FunctionCode == 0x03) {
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(tx_message->LRC, buffer, size);
+	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
 		tx_message->LRC = lrc(buffer, size);
-	  size = int2char(tx_message->LRC, buffer, size);
+	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
