@@ -14,12 +14,14 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
      this->flow_control_pin_->setup();
   }
-	this->emh1_tx_message->DeviceId = 0x01;
-	this->emh1_tx_message->FunctionCode = 0x03;
-	this->emh1_tx_message->Destination = 0x002E;
-	this->emh1_tx_message->DataLength = 0x0005;
-	this->emh1_tx_message->LRC = 0x00;
-	this->emh1_tx_message->WriteBytes = 0x00;
+	this->emh1_tx_message.DeviceId = 0x01;
+	eMH1MessageT *tx_message = this->emh1_tx_message;
+	tx_message->DeviceId = 0x01;
+	// this->emh1_tx_message->FunctionCode = 0x03;
+	//this->emh1_tx_message->Destination = 0x002E;
+	//this->emh1_tx_message->DataLength = 0x0005;
+	//this->emh1_tx_message->LRC = 0x00;
+	//this->emh1_tx_message->WriteBytes = 0x00;
 }
 
 void eMH1Modbus::loop() {
