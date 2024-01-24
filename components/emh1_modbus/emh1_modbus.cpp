@@ -14,14 +14,14 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
      this->flow_control_pin_->setup();
   }
-	this->emh1_tx_message.DeviceId = 0x01;
+	// this->emh1_tx_message.DeviceId = 0x01;
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 	tx_message->DeviceId = 0x01;
-	// this->emh1_tx_message->FunctionCode = 0x03;
-	//this->emh1_tx_message->Destination = 0x002E;
-	//this->emh1_tx_message->DataLength = 0x0005;
-	//this->emh1_tx_message->LRC = 0x00;
-	//this->emh1_tx_message->WriteBytes = 0x00;
+	tx_message->FunctionCode = 0x03;
+	tx_message->Destination = 0x002E;
+	tx_message->DataLength = 0x0005;
+	tx_message->LRC = 0x00;
+	tx_message->WriteBytes = 0x00;
 }
 
 void eMH1Modbus::loop() {
@@ -99,16 +99,17 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 
 	// Check Function Code
   r = ascii2uint8(&frame[3]);
+	uint16_t v;
 	switch(r) {
 	  case 0x03:
       ESP_LOGD(TAG, "Response to read operation");
-			uint8_t c = ascii2uint8(&frame[5]);
-
+			r = ascii2uint8(&frame[5]);
+	    ESP_LOGD(TAG, "Receiving 0x%02X bytes", r);
 			break;
 		case 0x10:
       ESP_LOGD(TAG, "Response to write operation");
       // Read eMH1 starting address
-	    uint16_t v = ascii2uint16(&frame[5];
+	    v = ascii2uint16(&frame[5];
 	    ESP_LOGD(TAG, "Starting address: 0x%04X", v);
 			break;
 	  case 0x90:
@@ -213,35 +214,39 @@ uint16_t char2int16(char value[4]) {
 }
 
 void eMH1Modbus::query_status_report(uint8_t address) {
-  this->emh1_tx_message->DeviceId = 0x01;
-	this->emh1_tx_message->FunctionCode = 0x03;
-	this->emh1_tx_message->Destination = 0x002E;
-	this->emh1_tx_message->DataLength = 0x0032;
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;
+	tx_message->FunctionCode = 0x03;
+	tx_message->Destination = 0x002E;
+	tx_message->DataLength = 0x0032;
   this->send();
 }
 
 void eMH1Modbus::query_device_info(uint8_t address) {
-  this->emh1_tx_message->DeviceId = 0x01;
-	this->emh1_tx_message->FunctionCode = 0x03;
-	this->emh1_tx_message->Destination = 0x002C;
-	this->emh1_tx_message->DataLength = 0x0001;
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;
+	tx_message->FunctionCode = 0x03;
+	tx_message->Destination = 0x002C;
+	tx_message->DataLength = 0x0001;
   this->send();
 }
 
 void eMH1Modbus::query_config_settings(uint8_t address) {
-  this->emh1_tx_message->DeviceId = 0x01;
-	this->emh1_tx_message->FunctionCode = 0x03;
-	this->emh1_tx_message->Destination = 0x0001;
-	this->emh1_tx_message->DataLength = 0x0002;
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;
+	tx_message->FunctionCode = 0x03;
+	tx_message->Destination = 0x0001;
+	tx_message->DataLength = 0x0002;
   this->send();
 }
 
 void eMH1Modbus::discover_devices() {
   // broadcast query for serial number
-  this->emh1_tx_message->DeviceId = 0x00;
-	this->emh1_tx_message->FunctionCode = 0x03;
-	this->emh1_tx_message->Destination = 0x0050;
-	this->emh1_tx_message->DataLength = 0x0008;
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x00;
+	tx_message->FunctionCode = 0x03;
+	tx_message->Destination = 0x0050;
+	tx_message->DataLength = 0x0008;
   this->send();
 }
 
@@ -279,21 +284,22 @@ uint8_t hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt)
 
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
 	char buffer[200];
 	uint8_t size = 0;
 	buffer[size++] = ':';
-	size = hexencode_ascii(emh1_tx_message->DeviceId, buffer, size);
-	size = hexencode_ascii(emh1_tx_message->FunctionCode, buffer, size);
-	size = hexencode_ascii(emh1_tx_message->Destination, buffer, size);
-	size = hexencode_ascii(emh1_tx_message->DataLength, buffer, size);
+	size = hexencode_ascii(tx_message->DeviceId, buffer, size);
+	size = hexencode_ascii(tx_message->FunctionCode, buffer, size);
+	size = hexencode_ascii(tx_message->Destination, buffer, size);
+	size = hexencode_ascii(tx_message->DataLength, buffer, size);
 
-	if (emh1_tx_message->FunctionCode == 0x03) {
-		emh1_tx_message->LRC = lrc(buffer, size);
-	  size = hexencode_ascii(emh1_tx_message->LRC, buffer, size);
+	if (tx_message->FunctionCode == 0x03) {
+		tx_message->LRC = lrc(buffer, size);
+	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
-		emh1_tx_message->LRC = lrc(buffer, size);
-	  size = hexencode_ascii(emh1_tx_message->LRC, buffer, size);
+		tx_message->LRC = lrc(buffer, size);
+	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
