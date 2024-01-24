@@ -69,8 +69,8 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		  return false;
 	}
 	// check LRC
-	uint8_t lrc1 = ascii2uint8(frame[at-4]);
-  uint8_t lrc2 = lrc(frame[1], at-5);
+	uint8_t lrc1 = ascii2uint8(&frame[at-4]);
+  uint8_t lrc2 = lrc(&frame[1], at-5);
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
 		return false;
