@@ -11,12 +11,11 @@ namespace emh1_modbus {
 static const char *const TAG = "emh1_modbus";
 
 void eMH1Modbus::setup() {
-  // if (this->flow_control_pin_ != nullptr) {
-  //   this->flow_control_pin_->setup();
-  // }
-  // ESP_LOGD(TAG, "Flow control pin setup");
-	pinMode(5, OUTPUT);
-	digitalWrite(5, LOW);
+  if (this->flow_control_pin_ != nullptr) {
+     this->flow_control_pin_->setup();
+  }
+	// pinMode(5, OUTPUT);
+	// digitalWrite(5, LOW);
 }
 
 void eMH1Modbus::loop() {
@@ -135,9 +134,9 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 }
 
 void eMH1Modbus::dump_config() {
-  // ESP_LOGCONFIG(TAG, "eMH1Modbus:");
-  // LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
-  // this->check_uart_settings(38400);
+  ESP_LOGCONFIG(TAG, "eMH1Modbus:");
+  LOG_PIN("  Flow Control Pin: ", this->flow_control_pin_);
+  this->check_uart_settings(38400);
 }
 
 float eMH1Modbus::get_setup_priority() const {
@@ -243,7 +242,6 @@ uint8_t int2char(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
 }
 
 void eMH1Modbus::send(eMH1MessageT *tx_message) {
-  ESP_LOGW(TAG, "TX -> Basics");
   // Send Modbus query as ASCII text (modbus-ascii !)
 	char buffer[200];
 	uint8_t size = 0;
@@ -263,14 +261,14 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGW(TAG, "TX -> %s", buffer);
-	digitalWrite(5, HIGH);
-  // if (this->flow_control_pin_ != nullptr)
-  //  this->flow_control_pin_->digital_write(false);
+	// digitalWrite(5, HIGH);
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(false);
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
-	digitalWrite(5, LOW);
-  // if (this->flow_control_pin_ != nullptr)
-  //   this->flow_control_pin_->digital_write(false);
+	// digitalWrite(5, LOW);
+  if (this->flow_control_pin_ != nullptr)
+    this->flow_control_pin_->digital_write(false);
 }
 
 }  // namespace emh1_modbus
