@@ -34,16 +34,6 @@ void eMH1Modbus::loop() {
   }
 }
 
-std::string hexencode_plain(const uint8_t *data, uint32_t len) {
-  char buf[20];
-  std::string res;
-  for (size_t i = 0; i < len; i++) {
-    sprintf(buf, "%02X", data[i]);
-    res += buf;
-  }
-  return res;
-}
-
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
@@ -99,7 +89,6 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   if (address == BROADCAST_ADDRESS) {
     // check control code && function code
     if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
-      // ESP_LOGI(TAG, "Inverter discovered. Serial number: %s", hexencode_plain(&data.front(), data.size()).c_str());
       ESP_LOGI(TAG, "Charger discovered.");
       // this->register_address(0x01);
     } else {
@@ -248,7 +237,6 @@ void eMH1Modbus::send(eMH1MessageT *tx_message) {
 	size = int2char(tx_message->FunctionCode, buffer, size);
 	size = int2char(tx_message->Destination, buffer, size);
 	size = int2char(tx_message->DataLength, buffer, size);
-	ESP_LOGW(TAG, "TEST DEST %s", hexencode_plain(tx_message->Destination, size).c_str());
 
 	if (tx_message->FunctionCode == 0x03) {
 		tx_message->LRC = lrc(buffer, size);
