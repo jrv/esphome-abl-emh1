@@ -131,7 +131,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
       		}
     		}
   			if (!found) {
-    		  ESP_LOGW(TAG, "Got eMH1 frame from unknown device address 0x%02X!", address);
+    		  ESP_LOGW(TAG, "Got eMH1 frame from unknown device address");
   			}
 			} else {
 				ESP_LOGW(TAG, "Response data size mismatch, expected %u got %u bytes", this->emh1_tx_message.DataLength * 2, r);
@@ -149,9 +149,8 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		default:
       ESP_LOGW(TAG, "Unknown response type");
   }
-
-
 	return true;
+	/*
   if (at == 3)
     return true;
   uint8_t address = frame[3];
@@ -219,6 +218,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 
   // return false to reset buffer
   return false;
+	*/
 }
 
 void eMH1Modbus::dump_config() {
