@@ -17,6 +17,7 @@ void eMH1Modbus::setup() {
 }
 
 void eMH1Modbus::loop() {
+  delay(1000);
 }
 
 void readData() {
