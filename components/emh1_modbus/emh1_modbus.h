@@ -32,7 +32,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
 
   float get_setup_priority() const override;
 
-  void send(eMH1MessageT *tx_message);
+  void send();
   void query_status_report(uint8_t address);
   void query_device_info(uint8_t address);
   void query_config_settings(uint8_t address);
@@ -42,6 +42,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
   bool parse_emh1_modbus_byte_(uint8_t byte);
   GPIOPin *flow_control_pin_{nullptr};
 
+  eMH1MessageT emh1_tx_message;
   std::vector<char> rx_buffer_;
   uint32_t last_emh1_modbus_byte_{0};
   std::vector<eMH1ModbusDevice *> devices_;
