@@ -6,9 +6,10 @@ namespace abl_emh1 {
 
 static const char *const TAG = "abl_emh1";
 
-static const uint8_t FUNCTION_STATUS_REPORT = 0x82;
-static const uint8_t FUNCTION_DEVICE_INFO = 0x83;
-static const uint8_t FUNCTION_CONFIG_SETTINGS = 0x84;
+static const uint8_t FUNCTION_STATUS_REPORT = 0x002E;
+static const uint8_t FUNCTION_DEVICE_INFO = 0x002C;
+static const uint8_t FUNCTION_CONFIG_SETTINGS = 0x0001;
+static const uint8_t FUNCTION_DISCOVER_DEVICES = 0x0050;
 
 static const uint8_t MODES_SIZE = 7;
 static const std::string MODES[MODES_SIZE] = {
@@ -51,6 +52,9 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
       break;
     case FUNCTION_CONFIG_SETTINGS:
       this->decode_config_settings_(data);
+      break;
+    case FUNCTION_DISCOVER_DEVICES:
+      this->decode_serialnumber_(data);
       break;
     default:
       // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
@@ -167,6 +171,11 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
 
   this->no_response_count_ = 0;
 }
+
+void ABLeMH1::decode_serial_number_(const uint8_t* data) {
+  this->no_response_count_ = 0;
+}
+
 
 void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->mode_sensor_, -1);
