@@ -43,17 +43,10 @@ uint8_t ascii2uint8(const char* value) {
 }
 
 uint8_t lrc(const char* value, uint8_t l) {
-	char buffer[100];
   uint8_t lrc_ = 0;
-  int cnt = 0;
   for (int i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
-		buffer[cnt++] = value[i];
-		buffer[cnt++] = value[i+1];
   }
-	buffer[cnt++] = '\r';
-	buffer[cnt++] = '\n';
-	ESP_LOGD(TAG, "LRC checked over: %s", buffer);
   return lrc_;
 }
 
@@ -63,6 +56,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   char *frame = &this->rx_buffer_[0];
 	if (byte != 0x0A) // 0x0A == LF == End of transmission
 	  return true;
+	
 	// check contents of first byte
 	switch (frame[0]) {
 	  case ':':
@@ -75,20 +69,37 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
       ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
 		  return false;
 	}
+
 	// check LRC
 	uint8_t lrc1 = ascii2uint8(&frame[at-3]);
   uint8_t lrc2 = lrc(&frame[1], at-3);
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
-		// return false;
+		return false;
+	} else {
+	  ESP_LOGD(TAG, "LRC check OK %02X", lrc1);
 	}
 
-  // Byte 1: modbus address digit 2 (check address)
+  // Check Device ID
 	uint8_t r = ascii2uint8(&frame[1]);
 	if (r == 0x01) {
 	  ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
 	} else {
 	  ESP_LOGW(TAG, "ERROR: Received from device ID: 0x%02X", r);
+		return false;
+  }
+
+	// Check Function Code
+  r = ascii2uint8(&frame[3]);
+	switch(r) {
+	  case 0x03:
+      ESP_LOGD(TAG, "Response to read operation";
+		case 0x10;
+      ESP_LOGD(TAG, "Response to write operation";
+	  case 0x90;
+      ESP_LOGW(TAG, "Error response";
+		case default:
+      ESP_LOGW(TAG, "Unknown response type";
   }
 	return true;
 
