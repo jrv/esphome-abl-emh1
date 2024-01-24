@@ -50,6 +50,18 @@ uint8_t ascii2uint8(const char* value) {
   return (highBits << 4 | lowBits);
 }
 
+uint16_t ascii2uint16(const char* value) {
+  uint16_t res = 0;
+  char c;
+  uint16_t bits;
+  for (uint8_t x=0; x<4; x++) {
+    c = value[x];
+    bits = (c > '9')?(c-55):(c-48);
+    res = (res << 4 | bits);
+  }
+  return res;
+}
+
 uint8_t lrc(const char* value, uint8_t l) {
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
@@ -199,18 +211,6 @@ void eMH1Modbus::dump_config() {
 float eMH1Modbus::get_setup_priority() const {
   // After UART bus
   return setup_priority::BUS - 1.0f;
-}
-
-uint16_t char2int16(char value[4]) {
-  uint16_t res = 0;
-  char c;
-  uint16_t bits;
-  for (uint8_t x=0; x<4; x++) {
-    c = value[x];
-    bits = (c > '9')?(c-55):(c-48);
-    res = (res << 4 | bits);
-  }
-  return res;
 }
 
 void eMH1Modbus::query_status_report(uint8_t address) {
