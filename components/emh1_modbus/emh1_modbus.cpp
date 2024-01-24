@@ -46,9 +46,19 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
   const char *frame = &this->rx_buffer_[0];
-	if (byte == 0x0A) {
-      ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
-			return false;
+	if (byte == 0x0A) { // 0x0A == LF == End of transmission
+	    // check contents of first byte
+			switch (frame[0]) {
+		    case ':':
+      	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
+				  return false;
+				case '>':
+      	  ESP_LOGD(TAG, "Received client transmission: %s", frame);
+					return false;
+				default:
+          ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
+				  return false;
+			}
 	}
 	return true;
 
