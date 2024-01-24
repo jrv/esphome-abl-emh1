@@ -53,7 +53,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 
   // Byte 1: modbus address digit 2 (check address)
   if (at == 1) {
-	  uint8_t r = ascii2uint8(frame, 2);
+	  uint8_t r = ascii2uint8(frame);
 	  if (r == 0x01) {
 	    ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
 		  return true;
@@ -120,8 +120,8 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
       if (frame[6] == 0x11) {
         device->on_emh1_modbus_data(frame[7], data);
       } else {
-        ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
-                 format_hex_pretty(frame, at + 1).c_str());
+        // ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
+        //         format_hex_pretty(frame, at + 1).c_str());
       }
       found = true;
     }
