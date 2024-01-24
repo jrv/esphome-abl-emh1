@@ -24,8 +24,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   uint8_t get_no_response_count() { return no_response_count_; }
 
   void update() override;
-  void on_emh1_modbus_data(const uint16_t &function, const uint16_t & datalength, 
-		const std::vector<uint8_t> &data) override;
+  void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
   void dump_config() override;
 
  protected:
