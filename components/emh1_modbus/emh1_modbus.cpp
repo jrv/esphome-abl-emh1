@@ -45,12 +45,13 @@ uint8_t ascii2uint8(const char* value) {
 uint8_t lrc(const char* value, uint8_t l) {
 	char buffer[100];
   uint8_t lrc_ = 0;
-  for (int i = 0; i < l-1; i = i + 2) {
+  cnt = 0;
+  for (i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
-		buffer[i] = value[i];
+		buffer[cnt++] = value[i];
   }
-	buffer[i++] = '\r';
-	buffer[i++] = '\n\;'
+	buffer[cnt++] = '\r';
+	buffer[cnt++] = '\n\;'
 	ESP_LOGD(TAG, "LRC checked over: %s", buffer);
   return lrc_;
 }
