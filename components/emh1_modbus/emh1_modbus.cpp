@@ -49,6 +49,7 @@ uint8_t lrc(const char* value, uint8_t l) {
   for (int i = 0; i < l-1; i = i + 2) {
     lrc_ -= ascii2uint8(&value[i]);
 		buffer[cnt++] = value[i];
+		buffer[cnt++] = value[i+1];
   }
 	buffer[cnt++] = '\r';
 	buffer[cnt++] = '\n';
@@ -76,28 +77,20 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	}
 	// check LRC
 	uint8_t lrc1 = ascii2uint8(&frame[at-3]);
-  uint8_t lrc2 = lrc(&frame[1], at-5);
+  uint8_t lrc2 = lrc(&frame[1], at-4);
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
 		return false;
 	}
-	return true;
-
-  // Byte 0: modbus address digit 1 (match all)
-  if (at == 0)
-    return true;
 
   // Byte 1: modbus address digit 2 (check address)
-  if (at == 1) {
-	  uint8_t r = ascii2uint8(frame);
-	  if (r == 0x01) {
-	    ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
-		  return true;
-	  } else {
-	    ESP_LOGD(TAG, "ERROR: Received from device ID: 0x%02X", r);
-			return false;
-		}
+	uint8_t r = ascii2uint8(&frame[1]);
+	if (r == 0x01) {
+	  ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
+	} else {
+	  ESP_LOGW(TAG, "ERROR: Received from device ID: 0x%02X", r);
   }
+	return true;
 
   if (at == 2)
     return true;
