@@ -310,7 +310,7 @@ void eMH1Modbus::send() {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 	char buffer[200];
 	uint8_t size = 0;
-	buffer[size++] = ':';
+	//buffer[size++] = ':';
 	size = hexencode_ascii(tx_message->DeviceId, buffer, size);
 	size = hexencode_ascii(tx_message->FunctionCode, buffer, size);
 	size = hexencode_ascii(tx_message->Destination, buffer, size);
@@ -321,14 +321,15 @@ void eMH1Modbus::send() {
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
-		tx_message->LRC = 201; // lrc(buffer, size);
+		tx_message->LRC = lrc(buffer, size);
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
-  ESP_LOGD(TAG, "TX -> %s", buffer);
+  ESP_LOGD(TAG, "TX -> :%s", buffer);
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
+	this->write(':');
   this->write_array((const uint8_t *)buffer, size);
   this->flush();
   if (this->flow_control_pin_ != nullptr)
