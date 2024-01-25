@@ -150,6 +150,9 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		default:
       ESP_LOGW(TAG, "Unknown response type");
   }
+	this->rx_buffer_.clear();
+  ESP_LOGD(TAG, "Cleared buffer");
+
 	return true;
 	/*
   if (at == 3)
@@ -318,7 +321,7 @@ void eMH1Modbus::send() {
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
-		tx_message->LRC = lrc(buffer, size);
+		tx_message->LRC = 201; // lrc(buffer, size);
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
