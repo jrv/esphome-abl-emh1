@@ -26,7 +26,7 @@ void eMH1Modbus::setup() {
 
 void eMH1Modbus::loop() {
   const uint32_t now = millis();
-  if (now - this->last_emh1_modbus_byte_ > 50) {
+  if (now - this->last_emh1_modbus_byte_ > 200) {
     this->rx_buffer_.clear();
     this->last_emh1_modbus_byte_ = now;
   }
