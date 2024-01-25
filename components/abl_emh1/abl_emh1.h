@@ -40,10 +40,10 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   text_sensor::TextSensor *errors_text_sensor_;
   uint8_t no_response_count_ = REDISCOVERY_THRESHOLD;
 
-  void decode_device_info_(const uint8_t* data);
-  void decode_status_report_(const uint8_t* data);
-  void decode_config_settings_(const uint8_t* data);
-	void decode_serial_number_(const uint8_t* data);
+  void decode_device_info_(const uint8_t* data, uint16_t datalength);
+  void decode_status_report_(const uint8_t* data, uint16_t datalength);
+  void decode_config_settings_(const uint8_t* data, uint16_t datalength);
+	void decode_serial_number_(const uint8_t* data, uint16_t datalength);
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
   void publish_device_offline_();

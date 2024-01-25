@@ -272,7 +272,7 @@ void eMH1Modbus::discover_devices() {
 
 // TODO: kijk of het zonder de bovenste twee hexencode_ascii definities kan?!
 
-uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
+uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -280,7 +280,7 @@ uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
 	return offset+2;
 }
 
-uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
+uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF000) >> 12;
   uint8_t lowBits = (val & 0x0F00) >> 8;
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -292,7 +292,7 @@ uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
 	return offset+4;
 }
 
-uint8_t hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
+uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val[x] & 0xF0) >> 4;
     uint8_t lowBits = (val[x] & 0x0F);

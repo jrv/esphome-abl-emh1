@@ -37,6 +37,9 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
   void query_device_info(uint8_t address);
   void query_config_settings(uint8_t address);
   void discover_devices();
+  uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset);
+	uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset);
+	uint8_t hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt);
 
  protected:
   bool parse_emh1_modbus_byte_(uint8_t byte);

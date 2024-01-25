@@ -45,16 +45,16 @@ static const char * const STATECODE[STATE_SIZE] = {
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
   switch (function) {
     case FUNCTION_DEVICE_INFO:
-      this->decode_device_info_(data);
+      this->decode_device_info_(data, datalength);
       break;
     case FUNCTION_STATUS_REPORT:
-      this->decode_status_report_(data);
+      this->decode_status_report_(data, datalength);
       break;
     case FUNCTION_CONFIG_SETTINGS:
-      this->decode_config_settings_(data);
+      this->decode_config_settings_(data, datalength);
       break;
     case FUNCTION_DISCOVER_DEVICES:
-      this->decode_serial_number_(data);
+      this->decode_serial_number_(data, datalength);
       break;
     default:
       // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
@@ -62,7 +62,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
   }
 }
 
-void ABLeMH1::decode_device_info_(const uint8_t* data) {
+void ABLeMH1::decode_device_info_(const uint8_t* data, uint16_t datalength) {
   ESP_LOGI(TAG, "Device info frame received");
   //ESP_LOGI(TAG, "  Device type: %d", data[0]);
   //ESP_LOGI(TAG, "  Rated power: %s", std::string(data.begin() + 1, data.begin() + 1 + 6).c_str());
@@ -74,7 +74,7 @@ void ABLeMH1::decode_device_info_(const uint8_t* data) {
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_config_settings_(const uint8_t* data) {
+void ABLeMH1::decode_config_settings_(const uint8_t* data, uint16_t datalength) {
   //if (data.size() != 68) {
   //  ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
   //  return;
@@ -92,7 +92,19 @@ void ABLeMH1::decode_config_settings_(const uint8_t* data) {
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_status_report_(const uint8_t* data) {
+void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
+  ESP_LOGI(TAG, "Status frame received");
+  this->publish_state_(this->mode_sensor_, 0);
+	
+  this->publish_state_(this->l1_current_sensor_, 10.0);
+  this->publish_state_(this->l2_current_sensor_, 10.0);
+  this->publish_state_(this->l3_current_sensor_, 10.0);
+  this->publish_state_(this->max_current_sensor_, NAN);
+  this->publish_state_(this->serial_number_sensor_, NAN);
+  this->publish_state_(this->outlet_state_sensor_, NAN);
+  this->publish_state_(this->mode_name_text_sensor_, "Online");
+	this->publish_state_(this->errors_text_sensor_, "Connected");
+
   //if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
     // Solax X1 mini status report (data_len 0x34: 52 bytes):
     // AA.55.00.0A.01.00.11.82.34.00.1A.00.02.00.00.00.00.00.00.00.00.00.00.09.21.13.87.00.00.FF.FF.
@@ -123,7 +135,6 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
 //    return uint32_t((data[i + 3] << 24) | (data[i + 2] << 16) | (data[i + 1] << 8) | data[i]);
 //  };
 
-  ESP_LOGI(TAG, "Status frame received");
 
 //  this->publish_state_(this->temperature_sensor_, (int16_t) emh1_get_16bit(0));
 //  this->publish_state_(this->energy_today_sensor_, emh1_get_16bit(2) * 0.1f);
@@ -172,7 +183,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data) {
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_serial_number_(const uint8_t* data) {
+void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   this->no_response_count_ = 0;
 }
 
