@@ -85,7 +85,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
    	  // ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
 		  return false;
 		case '>':
-    	// ESP_LOGD(TAG, "Received client transmission: %s", frame);
+    	ESP_LOGD(TAG, "Received client transmission: %s", frame);
 			break;
 		default:
       ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
