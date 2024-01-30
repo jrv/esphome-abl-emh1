@@ -45,7 +45,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 
   text_sensor::TextSensor *mode_name_text_sensor_;
   text_sensor::TextSensor *errors_text_sensor_;
-  text_sensor::Sensor *serial_number_text_sensor_;
+  text_sensor::TextSensor *serial_number_text_sensor_;
   uint8_t no_response_count_ = REDISCOVERY_THRESHOLD;
 	uint16_t config_age_ = CONFIG_AGE_THRESHOLD;
 
