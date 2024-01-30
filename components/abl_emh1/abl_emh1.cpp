@@ -66,7 +66,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   // const uint8_t* d = &data[2];
 	// std::string str(data, datalength);
-  this->publish_state_(this->serial_number_text_sensor_, '2W22xy01234567');
+  this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
   this->no_response_count_ = 0;
 }
 
