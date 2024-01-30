@@ -27,7 +27,6 @@ CONF_L1_CURRENT = "l1_current"
 CONF_L2_CURRENT = "l2_current"
 CONF_L3_CURRENT = "l3_current"
 CONF_MAX_CURRENT = "max_current"
-CONF_SERIAL_NUMBER = "serial_number"
 CONF_OUTLET_STATE = "outlet_state"
 CONF_EN1_STATUS = "en1_status"
 CONF_EN2_STATUS = "en2_status"
@@ -47,7 +46,6 @@ SENSORS = [
 		CONF_L2_CURRENT,
 		CONF_L3_CURRENT,
 		CONF_MAX_CURRENT,
-    CONF_SERIAL_NUMBER,
     CONF_OUTLET_STATE,
 		CONF_EN1_STATUS,
 		CONF_EN2_STATUS,
@@ -96,12 +94,6 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
-        ),
-        cv.Optional(CONF_SERIAL_NUMBER): sensor.sensor_schema(
-            unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_MODE,
-            accuracy_decimals=0,
-            device_class=DEVICE_CLASS_EMPTY,
         ),
         cv.Optional(CONF_OUTLET_STATE): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,

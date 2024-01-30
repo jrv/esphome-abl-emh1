@@ -9,9 +9,11 @@ DEPENDENCIES = ["abl_emh1"]
 
 CONF_MODE_NAME = "mode_name"
 CONF_ERRORS = "errors"
+CONF_SERIAL_NUMBER = "serial_number"
 
 ICON_MODE_NAME = "mdi:heart-pulse"
 ICON_ERRORS = "mdi:alert-circle-outline"
+ICON_SERIAL_NUMBER = "mdi:heart-pulse"
 
 CONFIG_SCHEMA = cv.Schema(
     {
@@ -28,13 +30,19 @@ CONFIG_SCHEMA = cv.Schema(
                 cv.Optional(CONF_ICON, default=ICON_ERRORS): cv.icon,
             }
         ),
+        cv.Optional(CONF_SERIAL_NUMBER): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+            {
+                cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
+                cv.Optional(CONF_ICON, default=ICON_SERIAL_NUMBER): cv.icon,
+            }
+        ),
     }
 )
 
 
 async def to_code(config):
     hub = await cg.get_variable(config[CONF_ABL_EMH1_ID])
-    for key in [CONF_MODE_NAME, CONF_ERRORS]:
+    for key in [CONF_MODE_NAME, CONF_ERRORS, CONF_SERIAL_NUMBER]:
         if key in config:
             conf = config[key]
             sens = cg.new_Pvariable(conf[CONF_ID])
