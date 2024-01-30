@@ -64,7 +64,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 }
 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
-  char *d = &data[2];
+  const char *d = &data[2];
   this->publish_state_(this->serial_number_text_sensor_, d);
   this->no_response_count_ = 0;
 }

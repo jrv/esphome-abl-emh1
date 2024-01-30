@@ -59,10 +59,10 @@ class eMH1ModbusDevice {
 //  virtual void on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) = 0;
 	virtual void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) = 0;
   
-	void query_status_report(uint8_t address) { this->parent_->query_status_report(address); }
-  void query_device_info(uint8_t address) { this->parent_->query_device_info(address); }
-  void query_config_settings(uint8_t address) { this->parent_->query_config_settings(address); }
-  void discover_devices() { this->parent_->discover_devices(); }
+	void query_status_report() { this->parent_->query_status_report(); }
+  void query_device_info() { this->parent_->query_device_info(); }
+  void query_config_settings() { this->parent_->query_config_settings(); }
+  void get_serial() { this->parent_->discover_devices(); }
 
  protected:
   friend eMH1Modbus;
