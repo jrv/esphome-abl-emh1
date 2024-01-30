@@ -9,6 +9,7 @@ namespace esphome {
 namespace abl_emh1 {
 
 static const uint8_t REDISCOVERY_THRESHOLD = 5;
+static const uint16_t CONFIG_AGE_TRESHOLD = 10;
 
 class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
  public:
@@ -47,6 +48,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   text_sensor::TextSensor *mode_name_text_sensor_;
   text_sensor::TextSensor *errors_text_sensor_;
   uint8_t no_response_count_ = REDISCOVERY_THRESHOLD;
+	uint16_t config_age_ = CONFIG_AGE_TRESHOLD;
 
   void decode_device_info_(const uint8_t* data, uint16_t datalength);
   void decode_status_report_(const uint8_t* data, uint16_t datalength);

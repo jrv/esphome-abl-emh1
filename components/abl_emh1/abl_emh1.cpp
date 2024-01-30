@@ -103,6 +103,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
 	for (x=0; x < STATE_SIZE; x++) {
 	  if (data[1] == STATECODE[x]) break;
 	}
+  this->publish_state_(this->outlet_state_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
 	this->publish_state_(this->errors_text_sensor_, "");
@@ -119,7 +120,6 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
   this->publish_state_(this->ucp_status_sensor_, (data[2] & 0x80) >> 7);
   // this->publish_state_(this->serial_number_sensor_, NAN);
-  // this->publish_state_(this->outlet_state_sensor_, NAN);
   // this->publish_state_(this->mode_name_text_sensor_, "Online");
 	// this->publish_state_(this->errors_text_sensor_, "Connected");
 
@@ -224,7 +224,12 @@ void ABLeMH1::publish_device_offline_() {
 }
 
 void ABLeMH1::update() {
-  if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
+  if (this->config_age_ >= CONFIG_AGE_THRESHOLD) {
+    ESP_LOGD(TAG, "Discover devices");
+	  this->discover_devices();
+	  return;
+	}
+	if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
     this->publish_device_offline_();
     ESP_LOGD(TAG, "The device is or was offline. Broadcasting discovery for address configuration...");
     this->discover_devices();
