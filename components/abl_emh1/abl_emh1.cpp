@@ -106,7 +106,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
 	this->publish_state_(this->errors_text_sensor_, "");
 	ESP_LOGI(TAG, "Info L1 0x%02X, 0x%02X", data[4], data[5]);
-  float l = (data[4] << 4 + data[5]) / 10.0;
+  float l = ((data[4] << 4) + data[5]) / 10.0;
   this->publish_state_(this->l1_current_sensor_, l);
   l = (data[6] << 4 + data[7]) / 10.0;
   this->publish_state_(this->l2_current_sensor_, l);
