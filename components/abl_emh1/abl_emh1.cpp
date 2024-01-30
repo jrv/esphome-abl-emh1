@@ -27,7 +27,7 @@ static const char *const STATE[STATE_SIZE] = {
 	"Waiting for EV",													// A1
 	"EV is asking for charging", 							// B1
 	"EV has the permission to charge",				// B2
-	"EV is charged",													// C2
+	"EV is charging",													// C2
 	"C2, reduced current (error F16, F17)",		// C3
 	"C2, reduced current (imbalance F15)",		// C4
 	"Outlet disabled",												// E0
@@ -105,6 +105,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->mode_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
 	this->publish_state_(this->errors_text_sensor_, "");
+	ESP_LOGI(TAG, "Info L1 0x%02X, 0x%02X", data[4], data[5]);
   float l = (data[4] << 4 + data[5]) / 10.0;
   this->publish_state_(this->l1_current_sensor_, l);
   l = (data[6] << 4 + data[7]) / 10.0;
