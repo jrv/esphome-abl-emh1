@@ -232,7 +232,7 @@ float eMH1Modbus::get_setup_priority() const {
   return setup_priority::BUS - 1.0f;
 }
 
-void eMH1Modbus::query_status_report(uint8_t address) {
+void eMH1Modbus::query_status_report() {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -241,7 +241,7 @@ void eMH1Modbus::query_status_report(uint8_t address) {
   this->send();
 }
 
-void eMH1Modbus::query_device_info(uint8_t address) {
+void eMH1Modbus::query_device_info() {
   ESP_LOGW(TAG, "Query: Query Device Info");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
@@ -251,7 +251,7 @@ void eMH1Modbus::query_device_info(uint8_t address) {
   this->send();
 }
 
-void eMH1Modbus::query_config_settings(uint8_t address) {
+void eMH1Modbus::query_config_settings() {
   ESP_LOGW(TAG, "Query: Query Config Settings");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;

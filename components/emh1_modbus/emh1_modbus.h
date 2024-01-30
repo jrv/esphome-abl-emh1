@@ -33,10 +33,10 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
   float get_setup_priority() const override;
 
   void send();
-  void query_status_report(uint8_t address);
-  void query_device_info(uint8_t address);
-  void query_config_settings(uint8_t address);
-  void discover_devices();
+  void query_status_report();
+  void query_device_info();
+  void query_config_settings();
+  void get_serial();
   uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset);
 	uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset);
 	uint8_t hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt);
