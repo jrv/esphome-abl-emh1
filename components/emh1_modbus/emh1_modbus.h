@@ -62,7 +62,7 @@ class eMH1ModbusDevice {
 	void query_status_report() { this->parent_->query_status_report(); }
   void query_device_info() { this->parent_->query_device_info(); }
   void query_config_settings() { this->parent_->query_config_settings(); }
-  void get_serial() { this->parent_->discover_devices(); }
+  void get_serial() { this->parent_->get_serial(); }
 
  protected:
   friend eMH1Modbus;
