@@ -25,7 +25,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_outlet_state_sensor(sensor::Sensor *outlet_state_sensor) { outlet_state_sensor_ = outlet_state_sensor; }
 	void set_mode_name_text_sensor(text_sensor::TextSensor *mode_name_text_sensor) { mode_name_text_sensor_ = mode_name_text_sensor; }
 	void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
-  void set_serial_number_sensor(sensor::TextSensor *serial_number_sensor) { serial_number_sensor_ = serial_number_sensor; }
+  void set_serial_number_text_sensor(sensor::TextSensor *serial_number_text_sensor) { serial_number_text_sensor_ = serial_number_text_sensor; }
 
   void update() override;
   void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
@@ -45,7 +45,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 
   text_sensor::TextSensor *mode_name_text_sensor_;
   text_sensor::TextSensor *errors_text_sensor_;
-  text_sensor::Sensor *serial_number_sensor_;
+  text_sensor::Sensor *serial_number_text_sensor_;
   uint8_t no_response_count_ = REDISCOVERY_THRESHOLD;
 	uint16_t config_age_ = CONFIG_AGE_THRESHOLD;
 

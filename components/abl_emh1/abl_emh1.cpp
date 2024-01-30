@@ -65,7 +65,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   char* d = data[2];
-  this->publish_state(this->serial_number_sensor_, d);
+  this->publish_state(this->serial_number_text_sensor_, d);
   this->no_response_count_ = 0;
 }
 
@@ -125,9 +125,6 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
   this->publish_state_(this->ucp_status_sensor_, (data[2] & 0x80) >> 7);
-  // this->publish_state_(this->serial_number_sensor_, NAN);
-  // this->publish_state_(this->mode_name_text_sensor_, "Online");
-	// this->publish_state_(this->errors_text_sensor_, "Connected");
 
   //if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
     // Solax X1 mini status report (data_len 0x34: 52 bytes):
@@ -217,10 +214,10 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->en2_status_sensor_, NAN);
   this->publish_state_(this->duty_cycle_reduced_, NAN);
   this->publish_state_(this->ucp_status_sensor_, NAN);
-  this->publish_state_(this->serial_number_sensor_, "");
   this->publish_state_(this->outlet_state_sensor_, NAN);
   this->publish_state_(this->mode_name_text_sensor_, "Offline");
 	this->publish_state_(this->errors_text_sensor_, "Offline");
+  this->publish_state_(this->serial_number_text_sensor_, "");
 }
 
 void ABLeMH1::update() {
