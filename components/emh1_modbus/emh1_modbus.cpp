@@ -265,7 +265,7 @@ void eMH1Modbus::discover_devices() {
   // broadcast query for serial number
   ESP_LOGW(TAG, "Query: Discover devices");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
-  tx_message->DeviceId = 0x00;
+  tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
 	tx_message->Destination = 0x0050;
 	tx_message->DataLength = 0x0008;
