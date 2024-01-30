@@ -38,7 +38,7 @@ static const char *const STATE[STATE_SIZE] = {
 	"Internal error",													// F2
   "Unknown State code"											// default
 };
-static const char * const STATECODE[STATE_SIZE] = {
+static const char STATECODE[STATE_SIZE] = {
   0xA1, 0xB1, 0xB2, 0xC2, 0xC3, 0xc4, 
 	0xE0, 0xE1, 0xE2, 0xE3, 0xF1, 0xF2, 0x00
 };
