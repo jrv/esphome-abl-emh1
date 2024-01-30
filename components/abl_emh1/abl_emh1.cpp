@@ -22,7 +22,7 @@ static const std::string MODES[MODES_SIZE] = {
     "Self Test",        // 6
 };
 
-static const uint8_t STATE_SIZE = 12;
+static const uint8_t STATE_SIZE = 13;
 static const char *const STATE[STATE_SIZE] = {
 	"Waiting for EV",													// A1
 	"EV is asking for charging", 							// B1
@@ -36,10 +36,11 @@ static const char *const STATE[STATE_SIZE] = {
 	"Bus idle",																// E3
 	"Unintended closed contact (Welding)",		// F1
 	"Internal error",													// F2
+  "Unknown State code"											// default
 };
-static const char * const STATECODE[STATE_SIZE] = {
-  "A1", "B1", "B2", "C2", "C3", "c4", 
-	"E0", "E1", "E2", "E3", "F1", "F2"
+static const uint8_t * const STATECODE[STATE_SIZE] = {
+  0xA1, 0xB1, 0xB2, 0xC2, 0xC3, 0xc4, 
+	0xE0, 0xE1, 0xE2, 0xE3, 0xF1, 0xF2, 0x00
 };
 
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
@@ -94,16 +95,28 @@ void ABLeMH1::decode_config_settings_(const uint8_t* data, uint16_t datalength) 
 
 void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   ESP_LOGI(TAG, "Status frame received");
-  this->publish_state_(this->mode_sensor_, 0);
-	
-  this->publish_state_(this->l1_current_sensor_, 10.0);
-  this->publish_state_(this->l2_current_sensor_, 10.0);
-  this->publish_state_(this->l3_current_sensor_, 10.0);
+	if (data[0] != 0x2E) {
+	  ESP_LOGD(TAG, "Expected data[0] to be 0x2E");
+	}
+	uint8_t x;
+	for (x=0; x < STATE_SIZE; x++) {
+	  if (data[1] == STATECODE[x]) break;
+	}
+  this->publish_state_(this->mode_sensor_, STATECODE[x]);
+  this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
+	this->publish_state_(this->errors_text_sensor_, "");
+  float l = (data[4] << 4 + data[5]) / 10.0;
+  this->publish_state_(this->l1_current_sensor_, l);
+  l = (data[6] << 4 + data[7]) / 10.0;
+  this->publish_state_(this->l2_current_sensor_, l);
+  l = (data[8] << 4 + data[9]) / 10.0;
+  this->publish_state_(this->l3_current_sensor_, l);
+  l = (data[2] << 4 + data[3]) / 10.0;
   this->publish_state_(this->max_current_sensor_, NAN);
-  this->publish_state_(this->serial_number_sensor_, NAN);
-  this->publish_state_(this->outlet_state_sensor_, NAN);
-  this->publish_state_(this->mode_name_text_sensor_, "Online");
-	this->publish_state_(this->errors_text_sensor_, "Connected");
+  // this->publish_state_(this->serial_number_sensor_, NAN);
+  // this->publish_state_(this->outlet_state_sensor_, NAN);
+  // this->publish_state_(this->mode_name_text_sensor_, "Online");
+	// this->publish_state_(this->errors_text_sensor_, "Connected");
 
   //if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
     // Solax X1 mini status report (data_len 0x34: 52 bytes):
