@@ -97,6 +97,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   ESP_LOGI(TAG, "Status frame received");
 	if (data[0] != 0x2E) {
 	  ESP_LOGD(TAG, "Expected data[0] to be 0x2E");
+		return;
 	}
 	uint8_t x;
 	for (x=0; x < STATE_SIZE; x++) {
@@ -105,14 +106,18 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->mode_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
 	this->publish_state_(this->errors_text_sensor_, "");
-  float l = ((data[4] << 4) + data[5]) / 10.0;
-  this->publish_state_(this->l1_current_sensor_, l);
-  l = ((data[6] << 4) + data[7]) / 10.0;
-  this->publish_state_(this->l2_current_sensor_, l);
-  l = ((data[8] << 4) + data[9]) / 10.0;
-  this->publish_state_(this->l3_current_sensor_, l);
-  l = ((data[2] << 4) + data[3]) / 10.0;
-  this->publish_state_(this->max_current_sensor_, l);
+  this->publish_state_(this->l1_current_sensor_, 
+  	((data[4] << 4) + data[5]) / 10.0);
+  this->publish_state_(this->l2_current_sensor_,
+    ((data[6] << 4) + data[7]) / 10.0);
+  this->publish_state_(this->l3_current_sensor_, 
+  	((data[8] << 4) + data[9]) / 10.0);
+  this->publish_state_(this->max_current_sensor_, 
+  	(((data[2] & 0x0F) << 4) + data[3]) * 10.0);
+  this->publish_state_(this->en1_status_sensor_, (data[2] & 0x10) >> 4);
+  this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
+  this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
+  this->publish_state_(this->ucp_status_sensor_, (data[2] & 0x80) >> 7);
   // this->publish_state_(this->serial_number_sensor_, NAN);
   // this->publish_state_(this->outlet_state_sensor_, NAN);
   // this->publish_state_(this->mode_name_text_sensor_, "Online");
@@ -208,6 +213,10 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->l2_current_sensor_, NAN);
   this->publish_state_(this->l3_current_sensor_, NAN);
   this->publish_state_(this->max_current_sensor_, NAN);
+  this->publish_state_(this->en1_status_sensor_, NAN);
+  this->publish_state_(this->en2_status_sensor_, NAN);
+  this->publish_state_(this->duty_cycle_reduced_, NAN);
+  this->publish_state_(this->ucp_status_sensor_, NAN);
   this->publish_state_(this->serial_number_sensor_, NAN);
   this->publish_state_(this->outlet_state_sensor_, NAN);
   this->publish_state_(this->mode_name_text_sensor_, "Offline");

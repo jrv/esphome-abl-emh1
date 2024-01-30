@@ -29,6 +29,10 @@ CONF_L3_CURRENT = "l3_current"
 CONF_MAX_CURRENT = "max_current"
 CONF_SERIAL_NUMBER = "serial_number"
 CONF_OUTLET_STATE = "outlet_state"
+CONF_EN1_STATUS = "en1_status"
+CONF_EN2_STATUS = "en2_status"
+CONF_DUTY_CYCLE_REDUCED = "duty_cycle_reduced"
+CONF_UCP_STATUS = "ucp_status"
 
 UNIT_HOURS = "h"
 UNIT_KILO_WATT_HOURS = "kWh"
@@ -45,6 +49,10 @@ SENSORS = [
 		CONF_MAX_CURRENT,
     CONF_SERIAL_NUMBER,
     CONF_OUTLET_STATE,
+		CONF_EN1_STATUS,
+		CONF_EN2_STATUS,
+		CONF_DUTY_CYCLE_REDUCED,
+		CONF_UCP_STATUS
 ]
 
 # pylint: disable=too-many-function-args
@@ -101,12 +109,37 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
         ),
+        cv.Optional(CONF_EN1_STATUS): sensor.sensor_schema(
+            unit_of_measurement=UNIT_EMPTY,
+            icon=ICON_MODE,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+        ),
+        cv.Optional(CONF_EN2_STATUS): sensor.sensor_schema(
+            unit_of_measurement=UNIT_EMPTY,
+            icon=ICON_MODE,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+        ),
+        cv.Optional(CONF_DUTY_CYCLE_REDUCED): sensor.sensor_schema(
+            unit_of_measurement=UNIT_EMPTY,
+            icon=ICON_MODE,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+        ),
+        cv.Optional(CONF_UCP_STATUS): sensor.sensor_schema(
+            unit_of_measurement=UNIT_EMPTY,
+            icon=ICON_MODE,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+        ),
         cv.Optional(CONF_MODE): sensor.sensor_schema(
             unit_of_measurement=UNIT_EMPTY,
             icon=ICON_MODE,
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
         ),
+
     }
 )
 

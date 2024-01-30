@@ -17,6 +17,10 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void set_l2_current_sensor(sensor::Sensor *l2_current_sensor) { l2_current_sensor_ = l2_current_sensor; }
   void set_l3_current_sensor(sensor::Sensor *l3_current_sensor) { l3_current_sensor_ = l3_current_sensor; }
 	void set_max_current_sensor(sensor::Sensor *max_current_sensor) { max_current_sensor_ = max_current_sensor; }
+	void set_en1_status_sensor(sensor::Sensor *en1_status_sensor) { en1_status_ = en1_status_sensor; }
+	void set_en2_status_sensor(sensor::Sensor *en2_status_sensor) { en2_status_ = en2_status_sensor; }
+	void set_duty_cycle_reduced_sensor(sensor::Sensor *duty_cycle_reduced_sensor) { duty_cycle_reduced_ = duty_cycle_reduced_sensor; }
+	void set_ucp_status_sensor(sensor::Sensor *ucp_status_sensor) { ucp_status_ = ucp_status_sensor; }
   void set_serial_number_sensor(sensor::Sensor *serial_number_sensor) { serial_number_sensor_ = serial_number_sensor; }
 	void set_outlet_state_sensor(sensor::Sensor *outlet_state_sensor) { outlet_state_sensor_ = outlet_state_sensor; }
 	void set_mode_name_text_sensor(text_sensor::TextSensor *mode_name_text_sensor) { mode_name_text_sensor_ = mode_name_text_sensor; }
@@ -33,6 +37,10 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   sensor::Sensor *l2_current_sensor_;
   sensor::Sensor *l3_current_sensor_;
   sensor::Sensor *max_current_sensor_;
+  sensor::Sensor *en1_status_sensor_;
+  sensor::Sensor *en2_status_sensor_;
+  sensor::Sensor *duty_cycle_reduced_;
+  sensor::Sensor *ucp_status_sensor_;
   sensor::Sensor *serial_number_sensor_;
   sensor::Sensor *outlet_state_sensor_;
 

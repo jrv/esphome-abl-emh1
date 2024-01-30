@@ -242,6 +242,7 @@ void eMH1Modbus::query_status_report(uint8_t address) {
 }
 
 void eMH1Modbus::query_device_info(uint8_t address) {
+  ESP_LOGW(TAG, "Query: Query Device Info");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -251,6 +252,7 @@ void eMH1Modbus::query_device_info(uint8_t address) {
 }
 
 void eMH1Modbus::query_config_settings(uint8_t address) {
+  ESP_LOGW(TAG, "Query: Query Config Settings");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -261,6 +263,7 @@ void eMH1Modbus::query_config_settings(uint8_t address) {
 
 void eMH1Modbus::discover_devices() {
   // broadcast query for serial number
+  ESP_LOGW(TAG, "Query: Discover devices");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x00;
 	tx_message->FunctionCode = 0x03;
