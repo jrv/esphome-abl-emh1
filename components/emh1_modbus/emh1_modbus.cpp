@@ -82,10 +82,10 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 		// check contents of first byte
 	switch (frame[0]) {
 	  case ':':
-   	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
+   	  // ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
 		  return false;
 		case '>':
-    	ESP_LOGD(TAG, "Received client transmission: %s", frame);
+    	// ESP_LOGD(TAG, "Received client transmission: %s", frame);
 			break;
 		default:
       ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
@@ -98,15 +98,11 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	if (lrc1 != lrc2) {
 		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
 		return false;
-	} else {
-	  ESP_LOGD(TAG, "LRC check OK %02X", lrc1);
-	}
+	} 
 
   // Check Device ID
 	uint8_t r = ascii2uint8(&frame[1]);
-	if (r == 0x01) {
-	  ESP_LOGD(TAG, "Received from device ID: 0x%02X", r);
-	} else {
+	if (r != 0x01) {
 	  ESP_LOGW(TAG, "ERROR: Received from device ID: 0x%02X", r);
 		return false;
   }
@@ -116,17 +112,16 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	uint16_t v;
 	switch(r) {
 	  case 0x03:
-      ESP_LOGD(TAG, "Response to read operation");
+      // ESP_LOGD(TAG, "Response to read operation");
 			r = ascii2uint8(&frame[5]);
-	    ESP_LOGD(TAG, "Receiving %u bytes", r);
+	    // ESP_LOGD(TAG, "Receiving %u bytes", r);
 			if (r == tx_message->DataLength * 2) {
-				ESP_LOGD(TAG, "Send data upwards");
+				// ESP_LOGD(TAG, "Send data upwards");
 				for (uint8_t x = 0; x<r; x++) {
 				  tx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
 				}
   			bool found = false;
   			for (auto *device : this->devices_) {
-				  // ESP_LOGW(TAG, "list device: 0x%02X", device->address_);
     		  if (device->address_ == tx_message->DeviceId) {
             device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
 						found = true;
