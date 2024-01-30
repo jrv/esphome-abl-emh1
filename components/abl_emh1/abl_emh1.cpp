@@ -9,7 +9,7 @@ static const char *const TAG = "abl_emh1";
 static const uint8_t FUNCTION_STATUS_REPORT = 0x002E;
 static const uint8_t FUNCTION_DEVICE_INFO = 0x002C;
 static const uint8_t FUNCTION_CONFIG_SETTINGS = 0x0001;
-static const uint8_t FUNCTION_DISCOVER_DEVICES = 0x0003; // 0x0050;
+static const uint8_t FUNCTION_GET_SERIAL = 0x0050;
 
 static const uint8_t MODES_SIZE = 7;
 static const std::string MODES[MODES_SIZE] = {
@@ -54,13 +54,19 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
     case FUNCTION_CONFIG_SETTINGS:
       this->decode_config_settings_(data, datalength);
       break;
-    case FUNCTION_DISCOVER_DEVICES:
+    case FUNCTION_GET_SERIAL:
       this->decode_serial_number_(data, datalength);
       break;
     default:
       // ESP_LOGW(TAG, "Unhandled ABL frame: %s", format_hex_pretty(&data.front(), data.size()).c_str());
       ESP_LOGW(TAG, "Unhandled ABL frame");
   }
+}
+
+void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
+  char* d = data[2];
+  this->publish_state(this->serial_number_sensor_, d);
+  this->no_response_count_ = 0;
 }
 
 void ABLeMH1::decode_device_info_(const uint8_t* data, uint16_t datalength) {
@@ -201,12 +207,6 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
-  
-  this->no_response_count_ = 0;
-}
-
-
 void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->mode_sensor_, -1);
   this->publish_state_(this->l1_current_sensor_, NAN);
@@ -217,7 +217,7 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->en2_status_sensor_, NAN);
   this->publish_state_(this->duty_cycle_reduced_, NAN);
   this->publish_state_(this->ucp_status_sensor_, NAN);
-  this->publish_state_(this->serial_number_sensor_, NAN);
+  this->publish_state_(this->serial_number_sensor_, "");
   this->publish_state_(this->outlet_state_sensor_, NAN);
   this->publish_state_(this->mode_name_text_sensor_, "Offline");
 	this->publish_state_(this->errors_text_sensor_, "Offline");
@@ -225,14 +225,15 @@ void ABLeMH1::publish_device_offline_() {
 
 void ABLeMH1::update() {
   if (this->config_age_ >= CONFIG_AGE_THRESHOLD) {
-    ESP_LOGD(TAG, "Discover devices");
-	  this->discover_devices();
+    ESP_LOGD(TAG, "Get device serial numer");
+	  this->get_serial();
+		this->config_age_ = 0;
 	  return;
 	}
 	if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
     this->publish_device_offline_();
     ESP_LOGD(TAG, "The device is or was offline. Broadcasting discovery for address configuration...");
-    this->discover_devices();
+    this->get_serial();
     //    this->query_device_info(this->address_);
     // Try to query live data on next update again. The device doesn't
     // respond to the discovery broadcast if it's already configured.

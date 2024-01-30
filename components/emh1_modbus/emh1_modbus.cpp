@@ -261,9 +261,9 @@ void eMH1Modbus::query_config_settings(uint8_t address) {
   this->send();
 }
 
-void eMH1Modbus::discover_devices() {
+void eMH1Modbus::get_serial() {
   // broadcast query for serial number
-  ESP_LOGW(TAG, "Query: Discover devices");
+  ESP_LOGW(TAG, "Query: Get Serial Number");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
