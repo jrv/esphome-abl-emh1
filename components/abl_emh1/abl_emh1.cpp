@@ -82,6 +82,10 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   this->no_response_count_ = 0;
 }
 
+void ABLeMH1::sendcode() {
+	  ESP_LOGW(TAG, "Running function sendcode()");
+}
+
 void ABLeMH1::decode_device_info_(const uint8_t* data, uint16_t datalength) {
   ESP_LOGI(TAG, "Device info frame received");
   //ESP_LOGI(TAG, "  Device type: %d", data[0]);
