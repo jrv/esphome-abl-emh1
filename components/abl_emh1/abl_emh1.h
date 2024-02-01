@@ -27,6 +27,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
   void set_serial_number_text_sensor(text_sensor::TextSensor *serial_number_text_sensor) { serial_number_text_sensor_ = serial_number_text_sensor; }
 
+	void sendcode();
   void update() override;
   void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
   void dump_config() override;
