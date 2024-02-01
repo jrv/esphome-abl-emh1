@@ -114,7 +114,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	  case 0x03:
       // ESP_LOGD(TAG, "Response to read operation");
 			r = ascii2uint8(&frame[5]);
-	    // ESP_LOGD(TAG, "Receiving %u bytes", r);
+	    ESP_LOGD(TAG, "Receiving %u bytes", r);
 			if (r == tx_message->DataLength * 2) {
 				// ESP_LOGD(TAG, "Send data upwards");
 				for (uint8_t x = 0; x<r; x++) {
