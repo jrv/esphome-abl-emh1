@@ -64,17 +64,18 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 }
 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
-	ESP_LOGI(TAG, "Serial number size: %d", datalength);
-  if (datalength > 14) {
-	  ESP_LOGW(TAG, "Serial number length problem");
-		return;
+	ESP_LOGI(TAG, "Serial number size: %d", datalength*2-2);
+  if (datalength*2-2 != 14) {
+	  ESP_LOGW(TAG, "Serial number length problem, detected %n", datalength*2-2);
 	}
+	uint8_t dmax = datalength*2-2;
+	if (dmax > 14) dmax = 14;
   char buffer[14];
-	for (int x=0; x<14; x++) {
+	for (int x=0; x<dmax; x++) {
 	  buffer[x] = '.';
 	}
-	for (int x=0; x < datalength; x++) {
-	  buffer[x] = (data[x*2] << 4) + data[x*2+1];
+	for (int x=0; x < dmax; x++) {
+	  buffer[x] = data[x+2];
 	}
   // const uint8_t* d = &data[2];
 	// std::string str(data, datalength);
