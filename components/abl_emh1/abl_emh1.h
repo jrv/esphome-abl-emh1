@@ -11,7 +11,7 @@ namespace abl_emh1 {
 static const uint8_t REDISCOVERY_THRESHOLD = 5;
 static const uint16_t CONFIG_AGE_THRESHOLD = 10;
 
-class ABLeMH1: public Component, public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
+class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
  public:
   void set_mode_sensor(sensor::Sensor *mode_sensor) { mode_sensor_ = mode_sensor; }
   void set_l1_current_sensor(sensor::Sensor *l1_current_sensor) { l1_current_sensor_ = l1_current_sensor; }
