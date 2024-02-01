@@ -226,7 +226,7 @@ void ABLeMH1::update() {
   if (this->config_age_ >= CONFIG_AGE_THRESHOLD) {
     ESP_LOGD(TAG, "Get device serial numer");
 	  this->get_serial();
-		this->config_age_ = 0;
+		// this->config_age_ = 0;
 	  return;
 	}
 	if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
