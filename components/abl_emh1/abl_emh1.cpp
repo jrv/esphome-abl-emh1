@@ -77,10 +77,8 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	for (int x=0; x < dmax; x++) {
 	  buffer[x] += data[x+2];
 	}
-  // const uint8_t* d = &data[2];
-	// std::string str(data, datalength);
-  //this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
-  this->publish_state_(this->serial_number_text_sensor_, buffer);
+	this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
+  // this->publish_state_(this->serial_number_text_sensor_, buffer);
   this->no_response_count_ = 0;
 }
 
@@ -239,14 +237,14 @@ void ABLeMH1::update() {
   if (this->config_age_ >= CONFIG_AGE_THRESHOLD) {
     ESP_LOGD(TAG, "Get device serial numer");
 	  this->get_serial();
-		// this->config_age_ = 0;
+		this->config_age_ = 0;
 	  return;
 	}
 	if (this->no_response_count_ >= REDISCOVERY_THRESHOLD) {
     this->publish_device_offline_();
     ESP_LOGD(TAG, "The device is or was offline. Broadcasting discovery for address configuration...");
     this->get_serial();
-    //    this->query_device_info(this->address_);
+    // this->query_device_info(this->address_);
     // Try to query live data on next update again. The device doesn't
     // respond to the discovery broadcast if it's already configured.
     this->no_response_count_ = 0;
