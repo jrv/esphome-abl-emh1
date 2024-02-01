@@ -32,7 +32,7 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
   void dump_config() override;
 	static ABLeMH1* get(
-      const abl_emh1::CustomComponentConstructor& c) {
+      const abl_emh1::ABLeMH1 c) {
     return static_cast<ABLeMH1*>(c.get_component(0));
   }
 
