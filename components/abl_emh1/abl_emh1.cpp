@@ -72,10 +72,10 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	if (dmax > 14) dmax = 14;
   char buffer[14];
 	for (int x=0; x<dmax; x++) {
-	  buffer[x] = '.';
+	  buffer[x] = 0;
 	}
 	for (int x=0; x < dmax; x++) {
-	  buffer[x] = data[x+2];
+	  buffer[x] += data[x+2];
 	}
   // const uint8_t* d = &data[2];
 	// std::string str(data, datalength);
