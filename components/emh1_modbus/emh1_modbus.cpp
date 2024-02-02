@@ -305,7 +305,32 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 }
 
 void eMH1Modbus::send_current(uint8_t x) {
+  char line[] = "0110001400010200A632";
+	// 0x01 = address
+	// 0x10 = write operation
+	// 0x0014 = Set Ic max
+	// 0x0001 = 1 16-bit register
+	// 0x02 = quantity of value bytes
+	// 0x00A6 = actual value (166 = 16.6%)
+	// 0x32 = LRC
+	// als Ic max = 80A, dan is 32A dus 40%
+	// en 16A is dan 20% = 00C8
+  uint8_t lrc2 = lrc(line, 18);
+	ESP_LOGD(TAG, "testline 1: %s", line);
+  ESP_LOGD(TAG, "TEST LRC: 0x%02X", lrc2);
+	uint16_t v = x / 80 * 1000;
+	char vc[5];
+	sprintf(vc, "%04X", vc);
+	for (x=0; x<4; x++) {
+	  line[x+14] = vc[x];
+	}
+	lrc2 = lrc(line, 18);
+	sprintf(vc, "%02X", lrc2);
+	line[18] = vc[0];
+	line[19] = vc[1];
+	ESP_LOGD(TAG, "testline 2: %s", line);
   ESP_LOGD(TAG, "Send Current TX -> :%d", x);
+
 }
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
