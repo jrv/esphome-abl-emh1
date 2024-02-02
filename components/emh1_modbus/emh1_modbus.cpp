@@ -304,6 +304,9 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 	return offset+cnt*2;
 }
 
+void eMH1Modbus::send_current(uint8_t x) {
+  ESP_LOGD(TAG, "Send Current TX -> :%d", x);
+}
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
