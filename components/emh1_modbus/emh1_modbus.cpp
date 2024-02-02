@@ -321,14 +321,17 @@ void eMH1Modbus::send_current(uint8_t x) {
 	uint16_t v = x / 80 * 1000;
 	char vc[5];
 	sprintf(vc, "%04X", vc);
+	ESP_LOGD(TAG, "Value of vc is: %s (0x%04X)", vc, v);
 	for (x=0; x<4; x++) {
 	  line[x+14] = vc[x];
 	}
+	ESP_LOGD(TAG, "Value of line after adding vc is: %s", line);
 	lrc2 = lrc(line, 18);
+  ESP_LOGD(TAG, "TEST LRC: 0x%02X", lrc2);
 	sprintf(vc, "%02X", lrc2);
 	line[18] = vc[0];
 	line[19] = vc[1];
-	ESP_LOGD(TAG, "testline 2: %s", line);
+	ESP_LOGD(TAG, "Value of line after adding lrc is: %s", line);
   ESP_LOGD(TAG, "Send Current TX -> :%d", x);
 
 }
