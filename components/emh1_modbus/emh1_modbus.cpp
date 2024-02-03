@@ -315,26 +315,18 @@ void eMH1Modbus::send_current(uint8_t x) {
 	// 0x32 = LRC
 	// als Ic max = 80A, dan is 32A dus 40%
 	// en 16A is dan 20% = 00C8
-  uint8_t lrc2 = lrc(line, 18);
-	ESP_LOGD(TAG, "testline 1: %s", line);
-  ESP_LOGD(TAG, "TEST LRC: 0x%02X", lrc2);
-	uint16_t v = x / 80 * 1000;
-	char vc[5];
-	sprintf(vc, "%04X", vc);
-	ESP_LOGD(TAG, "Value of vc is: %s (0x%04X)", vc, v);
-	for (x=0; x<4; x++) {
-	  line[x+14] = vc[x];
-	}
-	ESP_LOGD(TAG, "Value of line after adding vc is: %s", line);
-	lrc2 = lrc(line, 18);
-  ESP_LOGD(TAG, "TEST LRC: 0x%02X", lrc2);
-	sprintf(vc, "%02X", lrc2);
-	line[18] = vc[0];
-	line[19] = vc[1];
-	ESP_LOGD(TAG, "Value of line after adding lrc is: %s", line);
-  ESP_LOGD(TAG, "Send Current TX -> :%d", x);
-
+  ESP_LOGW(TAG, "Set Max Current");
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;				// default address
+	tx_message->FunctionCode = 0x10;		// write operation
+	tx_message->Destination = 0x0014;		// 
+	tx_message->DataLength = 0x0001;
+	tx_message->WriteBytes = 0x02;
+	tx_message->Data[0] = 0x00;
+	tx_message->Data[1] = 0xA6;
+  this->send();
 }
+
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
@@ -351,12 +343,17 @@ void eMH1Modbus::send() {
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  // TODO: write moet nog!!!@
+	  size = hexencode_ascii(tx_message->WriteBytes, buffer, size);
+	  size = hexencode_ascii(tx_message->Data[0], buffer, size);
+	  size = hexencode_ascii(tx_message->Data[1], buffer, size);
 		tx_message->LRC = lrc(buffer, size);
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGD(TAG, "TX -> :%s", buffer);
+	if (tx_message->FunctionCode != 0x03) 
+	  return;
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
 	this->write(':');
