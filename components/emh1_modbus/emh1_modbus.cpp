@@ -351,8 +351,7 @@ void eMH1Modbus::send() {
 	} else {
 	  // TODO: write moet nog!!!@
 	  size = hexencode_ascii(tx_message->WriteBytes, buffer, size);
-	  size = hexencode_ascii(tx_message->Data[0], buffer, size);
-	  size = hexencode_ascii(tx_message->Data[1], buffer, size);
+	  size = hexencode_ascii(tx_message->Data, buffer, size, 2);
 		tx_message->LRC = lrc(buffer, size);
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
