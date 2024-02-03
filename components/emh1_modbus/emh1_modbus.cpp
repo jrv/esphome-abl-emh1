@@ -315,15 +315,19 @@ void eMH1Modbus::send_current(uint8_t x) {
 	// 0x32 = LRC
 	// als Ic max = 80A, dan is 32A dus 40%
 	// en 16A is dan 20% = 00C8
-  ESP_LOGW(TAG, "Set Max Current");
+  ESP_LOGW(TAG, "Set Max Current to %d Amps", x);
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
 	tx_message->Destination = 0x0014;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
-	tx_message->Data[0] = 0x00;
-	tx_message->Data[1] = 0xA6;
+	uint16_t v = (x/80)*1000;
+	uint8_t v1 = v >> 8;
+	uint8_t v2 = v & 0x00FF;
+  ESP_LOGW(TAG, "Amp setting: 0x%02X 0x%02X", v1, v2);
+	tx_message->Data[0] = v1;
+	tx_message->Data[1] = v2;
   this->send();
 }
 
