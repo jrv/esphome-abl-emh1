@@ -326,6 +326,8 @@ void eMH1Modbus::send_current(uint8_t x) {
   ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
 	uint8_t v2 = 0 + (v & 0x00FF);
+	v1 = 0x00;
+	v2 = 0xA6;
   ESP_LOGW(TAG, "Amp setting: 0x%02X 0x%02X", v1, v2);
 	tx_message->Data[0] = v1;
 	tx_message->Data[1] = v2;
