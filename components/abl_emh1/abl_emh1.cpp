@@ -137,7 +137,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->l3_current_sensor_, 
   	((data[8] << 4) + data[9]) / 10.0);
   this->publish_state_(this->max_current_sensor_, 
-  	(((data[2] & 0x0F) << 4) + data[3]) * 10.0);
+  	(((data[2] & 0x0F) << 4) + data[3]) * 1000.0 / 16625.0);
   this->publish_state_(this->en1_status_sensor_, (data[2] & 0x10) >> 4);
   this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);

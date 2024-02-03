@@ -322,14 +322,14 @@ void eMH1Modbus::send_current(uint8_t x) {
 	tx_message->Destination = 0x0014;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
-	uint16_t v = x*1000/80;
+	uint16_t v = 11625*x/1000;
   ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
 	uint8_t v2 = 0 + (v & 0x00FF);
   ESP_LOGW(TAG, "Amp setting: 0x%02X 0x%02X", v1, v2);
 	tx_message->Data[0] = v1;
 	tx_message->Data[1] = v2;
-  this->send();
+  // this->send();
 }
 
 void eMH1Modbus::send() {
@@ -357,8 +357,6 @@ void eMH1Modbus::send() {
 	buffer[size++] = 0x0D;
 	buffer[size++] = 0x0A;
   ESP_LOGD(TAG, "TX -> :%s", buffer);
-	if (tx_message->FunctionCode != 0x03) 
-	  return;
   if (this->flow_control_pin_ != nullptr)
     this->flow_control_pin_->digital_write(true);
 	this->write(':');
