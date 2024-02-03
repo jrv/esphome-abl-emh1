@@ -129,97 +129,30 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->outlet_state_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
-	this->publish_state_(this->errors_text_sensor_, "");
-  this->publish_state_(this->l1_current_sensor_, 
-  	((data[4] << 4) + data[5]) / 10.0);
-  this->publish_state_(this->l2_current_sensor_,
-    ((data[6] << 4) + data[7]) / 10.0);
-  this->publish_state_(this->l3_current_sensor_, 
-  	((data[8] << 4) + data[9]) / 10.0);
-	uint16_t mc = ((data[2] & 0x0F) << 4) + data[3];
-	ESP_LOGD(TAG, "Read max current value 0x%04X", mc);
-	float v = mc * 1000.0 / 16625.0;
-  this->publish_state_(this->max_current_sensor_, v);
   this->publish_state_(this->en1_status_sensor_, (data[2] & 0x10) >> 4);
   this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
   this->publish_state_(this->ucp_status_sensor_, (data[2] & 0x80) >> 7);
-
-  //if (data.size() != 52 && data.size() != 50 && data.size() != 56) {
-    // Solax X1 mini status report (data_len 0x34: 52 bytes):
-    // AA.55.00.0A.01.00.11.82.34.00.1A.00.02.00.00.00.00.00.00.00.00.00.00.09.21.13.87.00.00.FF.FF.
-    // 00.00.00.12.00.00.00.15.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.04.D6
-
-    // Solax X1 mini g2 status report (data_len 0x32: 50 bytes):
-    // AA.55.00.0A.01.00.11.82.32.00.21.00.02.07.EC.00.00.00.1D.00.00.00.18.09.55.13.80.02.2B.FF.FF.
-    // 00.00.5D.AF.00.00.10.50.00.02.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.07.A4
-
-    // Solax X1 mini g3 status report (data_len 0x38: 56 bytes):
-    // AA.55.00.0A.01.00.11.82.38.00.1A.00.03.04.0C.00.00.00.19.00.00.00.0B.08.FC.13.8A.00.F8.FF.FF.
-    // 00.00.00.2B.00.00.00.0D.00.02.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.00.8A.00.DE.08.5F
-    //ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
-    //ESP_LOGW(TAG, "Your device is probably not supported. Please create an issue here: "
-    //              "https://github.com/syssi/esphome-solax-x1-mini/issues");
-    //ESP_LOGW(TAG, "Please provide the following status response data: %s",
-    //         format_hex_pretty(&data.front(), data.size()).c_str());
-    //return;
-  //}
-
-//  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
-//    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
-//  };
-//  auto emh1_get_32bit = [&](size_t i) -> uint32_t {
-//    return uint32_t((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
-//  };
-//  auto emh1_get_error_bitmask = [&](size_t i) -> uint32_t {
-//    return uint32_t((data[i + 3] << 24) | (data[i + 2] << 16) | (data[i + 1] << 8) | data[i]);
-//  };
-
-
-//  this->publish_state_(this->temperature_sensor_, (int16_t) emh1_get_16bit(0));
-//  this->publish_state_(this->energy_today_sensor_, emh1_get_16bit(2) * 0.1f);
-//  this->publish_state_(this->dc1_voltage_sensor_, emh1_get_16bit(4) * 0.1f);
-//  this->publish_state_(this->dc2_voltage_sensor_, emh1_get_16bit(6) * 0.1f);
-//  this->publish_state_(this->dc1_current_sensor_, emh1_get_16bit(8) * 0.1f);
-//  this->publish_state_(this->dc2_current_sensor_, emh1_get_16bit(10) * 0.1f);
-//  this->publish_state_(this->ac_current_sensor_, emh1_get_16bit(12) * 0.1f);
-//  this->publish_state_(this->ac_voltage_sensor_, emh1_get_16bit(14) * 0.1f);
-//  this->publish_state_(this->ac_frequency_sensor_, emh1_get_16bit(16) * 0.01f);
-//  this->publish_state_(this->ac_power_sensor_, emh1_get_16bit(18));
-
-  // register 20 is not used
-
-//  uint32_t raw_energy_total = emh1_get_32bit(22);
-  // The inverter publishes a zero once per day on boot-up. This confuses the energy dashboard.
-//  if (raw_energy_total > 0) {
-    // this->publish_state_(this->energy_total_sensor_, raw_energy_total * 0.1f);
-//  }
-
-//  uint32_t raw_runtime_total = emh1_get_32bit(26);
-//  if (raw_runtime_total > 0) {
-    // this->publish_state_(this->runtime_total_sensor_, (float) raw_runtime_total);
-//  }
-
- // uint8_t mode = (uint8_t) emh1_get_16bit(30);
-  // this->publish_state_(this->mode_sensor_, mode);
-  // this->publish_state_(this->mode_name_text_sensor_, (mode < MODES_SIZE) ? MODES[mode] : "Unknown");
-
-  ///this->publish_state_(this->grid_voltage_fault_sensor_, emh1_get_16bit(32) * 0.1f);
-  //this->publish_state_(this->grid_frequency_fault_sensor_, emh1_get_16bit(34) * 0.01f);
-  //this->publish_state_(this->dc_injection_fault_sensor_, emh1_get_16bit(36) * 0.001f);
-  //this->publish_state_(this->temperature_fault_sensor_, (float) emh1_get_16bit(38));
-  //this->publish_state_(this->pv1_voltage_fault_sensor_, emh1_get_16bit(40) * 0.1f);
-  //this->publish_state_(this->pv2_voltage_fault_sensor_, emh1_get_16bit(42) * 0.1f);
-  //this->publish_state_(this->gfc_fault_sensor_, emh1_get_16bit(44) * 0.001f);
-
-//  uint32_t error_bits = emh1_get_error_bitmask(46);
-  //this->publish_state_(this->error_bits_sensor_, error_bits);
-  //this->publish_state_(this->errors_text_sensor_, this->error_bits_to_string_(error_bits));
-
-//  if (data.size() > 50) {
-//    ESP_LOGD(TAG, "  CT Pgrid: %d W", emh1_get_16bit(50));
-//  }
-
+	if (STATECODE[x] == 0xA1) {
+    this->publish_state_(this->l1_current_sensor_, 0.0);
+    this->publish_state_(this->l2_current_sensor_, 0.0);
+    this->publish_state_(this->l3_current_sensor_, 0.0);
+	  this->publish_state_(this->errors_text_sensor_, "");
+  } else {
+	  this->publish_state_(this->errors_text_sensor_, "");
+    this->publish_state_(this->l1_current_sensor_, 
+  	  ((data[4] << 4) + data[5]) / 10.0);
+    this->publish_state_(this->l2_current_sensor_,
+      ((data[6] << 4) + data[7]) / 10.0);
+    this->publish_state_(this->l3_current_sensor_, 
+  	  ((data[8] << 4) + data[9]) / 10.0);
+	}
+	uint8_t v1 = data[2] & 0x03;
+	uint8_t v2 = data[3];
+	//uint16_t mc = ((data[2] & 0x03) << 4) + data[3];
+	ESP_LOGD(TAG, "Read max current value 0x%02X 0x%02X", v1, v2);
+	// float v = mc * 1000.0 / 16625.0;
+  this->publish_state_(this->max_current_sensor_, 32.0);
   this->no_response_count_ = 0;
 }
 
