@@ -151,7 +151,6 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
 	uint8_t v2 = data[3];
 	float v = (v1 * 256 + v2) * 1000.0 / 16625.0;
 	ESP_LOGD(TAG, "Read max current value 0x%02X 0x%02X", v1, v2);
-	float v = mc * 1000.0 / 16625.0;
   this->publish_state_(this->max_current_sensor_, v);
   this->no_response_count_ = 0;
 }
