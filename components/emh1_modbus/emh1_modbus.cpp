@@ -305,10 +305,10 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 }
 
 void eMH1Modbus::send_current(uint8_t x) {
-  char line[] = "0110001400010200A632";
+  char line[] = "0110002C00010200A632";
 	// 0x01 = address
 	// 0x10 = write operation
-	// 0x0014 = Set Ic max
+	// 0x002C = Set Ic max
 	// 0x0001 = 1 16-bit register
 	// 0x02 = quantity of value bytes
 	// 0x00A6 = actual value (166 = 16.6%)
@@ -319,7 +319,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
-	tx_message->Destination = 0x0014;		// 
+	tx_message->Destination = 0x002C;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
 	uint16_t v = 16625*x/1000;
