@@ -304,6 +304,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 	return offset+cnt*2;
 }
 
+/*
 void eMH1Modbus::send_current_old(uint8_t x) {
   char line[] = "0110002C00010200A632";
 	// 0x01 = address
@@ -331,7 +332,7 @@ void eMH1Modbus::send_current_old(uint8_t x) {
 	tx_message->Data[1] = 0xA7;
   this->send();
 }
-
+*/
 void eMH1Modbus::send_current(uint8_t x) {
   this->flow_control_pin_->digital_write(true);
 	int y;
