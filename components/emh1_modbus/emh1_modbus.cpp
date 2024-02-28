@@ -336,37 +336,37 @@ void eMH1Modbus::send_current(uint8_t x) {
   this->flow_control_pin_->digital_write(true);
 	int y;
 	for (y=0; y<3; y++) {
-		this->write(':01100005000102E0E027');
+		this->write_array(':01100005000102E0E027', 21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
 	}
 	for (y=0; y<3; y++) {
- 		this->write(':01100005000102E2E223');
+ 		this->write_array(':01100005000102E2E223',21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
 	}
 	for (y=0; y<3; y++) {
- 		this->write(':0110002C000102500070');
+ 		this->write_array(':0110002C000102500070',21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
 	}
 	for (y=0; y<3; y++) {
- 		this->write(':0110002D000102837CC0');
+ 		this->write_array(':0110002D000102837CC0',21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
 	}
   for (y=0; y<3; y++) {
- 		this->write(':0110002D000102014D71');
+ 		this->write_array(':0110002D000102014D71',21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
 	}
   for (y=0; y<3; y++) {
- 		this->write(':001100005000102A1A1A');
+ 		this->write_array(':001100005000102A1A1A',21);
 		this->write(0x0D);
 		this->write(0x0A);
   	this->flush();
