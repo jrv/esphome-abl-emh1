@@ -2,6 +2,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 #include "esphome.h"
+#include <cmath>
 
 #define BROADCAST_ADDRESS 0xFF
 
@@ -304,15 +305,14 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 	return offset+cnt*2;
 }
 
-/*
-void eMH1Modbus::send_current_old(uint8_t x) {
-  char line[] = "0110002C00010200A632";
+void eMH1Modbus::send_current(uint8_t x) {
+  char line[] = "0110002D00010200A632";
 	// 0x01 = address
 	// 0x10 = write operation
-	// 0x002C = Set Ic max
+	// 0x002D = Set Ic max
 	// 0x0001 = 1 16-bit register
 	// 0x02 = quantity of value bytes
-	// 0x00A6 = actual value (166 = 16.6%)
+	// 0x00A6 = actual value (166 = 16.6%) = 10A
 	// 0x32 = LRC
 	// als Ic max = 80A, dan is 32A dus 40%
 	// en 16A is dan 20% = 00C8
@@ -323,16 +323,17 @@ void eMH1Modbus::send_current_old(uint8_t x) {
 	tx_message->Destination = 0x002C;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
-	uint16_t v = 16625*x/1000;
+	uint16_t v = std::floor(16.67*x);
   ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
 	uint8_t v2 = 0 + (v & 0x00FF);
   ESP_LOGW(TAG, "Amp setting: 0x%02X 0x%02X", v1, v2);
-	tx_message->Data[0] = 0x00;
-	tx_message->Data[1] = 0xA7;
+	tx_message->Data[0] = 0x01;
+	tx_message->Data[1] = 0x4D;
   this->send();
 }
-*/
+
+/*
 void eMH1Modbus::send_current(uint8_t x) {
   this->flow_control_pin_->digital_write(true);
 	int y;
@@ -374,6 +375,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	}
   this->flow_control_pin_->digital_write(false);
 }
+*/
 
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
