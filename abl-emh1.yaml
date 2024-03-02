@@ -1,0 +1,99 @@
+substitutions:
+  name: abl-emh1
+  device_description: "Monitor and configure ABL eMH1 Charger via RS485/Modbus-ASCII"
+  external_components_source: github://jrv/esphome-abl-emh1
+  tx_pin: "17"
+  rx_pin: "16"
+  flow_control_pin: "5"
+
+esphome:
+  name: ${name}
+  comment: ${device_description}
+  friendly_name: ABL eMH1 Charger
+  project:
+    name: "jrv.esphome-abl-emh1"
+    version: 0.0.1
+
+esp32:
+  board: esp32dev
+
+external_components:
+  - source: ${external_components_source}
+    refresh: 0s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+ota:
+  password: !secret ota_password
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret api_key
+
+uart:
+  id: uart_2
+  baud_rate: 38400
+  tx_pin: ${tx_pin}
+  rx_pin: ${rx_pin}
+  parity: EVEN
+
+emh1_modbus:
+    uart_id: uart_2
+    flow_control_pin: ${flow_control_pin}
+    id: modbus0
+
+abl_emh1:
+  emh1_modbus_id: modbus0
+  update_interval: 5s
+
+text_sensor:
+  - platform: abl_emh1
+    mode_name:
+      name: "${name} mode name"
+    errors:
+      name: "${name} errors"
+    serial_number:
+      name: "${name} Serial number"
+
+sensor:
+  - platform: abl_emh1
+    l1_current:
+      name: "${name} L1 current"
+    l2_current:
+      name: "${name} L2 current"
+    l3_current:
+      name: "${name} L3 current"
+    max_current:
+      name: "${name} Max current"
+      id: max_current
+    en1_status:
+      name: "${name} EN1 status"
+    en2_status:
+      name: "${name} EN2 status"
+    duty_cycle_reduced:
+      name: "${name} Reduced Duty Cycle (max_current)"
+    ucp_status:
+      name: "${name} Ucp Status <= 10V"
+    outlet_state:
+      name: "${name} Outlet state"
+
+number:
+  - platform: template
+    name: "${name} Set current"
+    id: set_current
+    min_value: 3
+    max_value: 32
+    step: 1
+    optimistic: false
+    lambda: "return (int)id(max_current) * 1.0; "
+    set_action:
+      lambda: |-
+        ESP_LOGD("main", "Sending modbus value = %f", x);
+        auto emh = new eMH1Modbus();
+        emh->send_current(x);
+           
