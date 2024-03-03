@@ -1,5 +1,5 @@
 substitutions:
-  name: abl-emh1
+  name: abl_emh1
   device_description: "Monitor and configure ABL eMH1 Charger via RS485/Modbus-ASCII"
   external_components_source: github://jrv/esphome-abl-emh1
   tx_pin: "17"
@@ -90,10 +90,9 @@ number:
     max_value: 32
     step: 1
     optimistic: false
-    lambda: "return (int)id(max_current) * 1.0; "
+    lambda: 'return id(max_current).state;'
     set_action:
       lambda: |-
         ESP_LOGD("main", "Sending modbus value = %f", x);
-        auto emh = new eMH1Modbus();
-        emh->send_current(x);
+        id(modbus0)->send_current(x);
            
