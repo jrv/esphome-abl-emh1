@@ -287,7 +287,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	this->send();
 	delay(1);
 	*/
-	tx_message->Destination = 0x0014;
+	tx_message->Destination = 0x002D;
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
 	uint16_t v = std::floor(16.67*x);
