@@ -248,7 +248,6 @@ void eMH1Modbus::send_current(uint8_t x) {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
-	/*
 	tx_message->Destination = 0x0005;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
@@ -286,10 +285,6 @@ void eMH1Modbus::send_current(uint8_t x) {
 	delay(1);
 	this->send();
 	delay(1);
-	*/
-	tx_message->Destination = 0x002D;
-	tx_message->DataLength = 0x0001;
-	tx_message->WriteBytes = 0x02;
 	uint16_t v = std::floor(16.67*x);
   ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
@@ -298,7 +293,6 @@ void eMH1Modbus::send_current(uint8_t x) {
 	tx_message->Data[0] = v1;
 	tx_message->Data[1] = v2;
 	this->send();
-	/*
 	delay(1);
 	this->send();
 	delay(1);
