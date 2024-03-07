@@ -47,6 +47,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
   GPIOPin *flow_control_pin_{nullptr};
 
   eMH1MessageT emh1_tx_message;
+  eMH1MessageT emh1_rx_message;
   std::vector<char> rx_buffer_;
   uint32_t last_emh1_modbus_byte_{0};
   std::vector<eMH1ModbusDevice *> devices_;
