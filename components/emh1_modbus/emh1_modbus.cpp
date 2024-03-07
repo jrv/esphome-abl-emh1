@@ -74,7 +74,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
     return true;
   this->rx_buffer_.push_back('\0');
   char *frame = &this->rx_buffer_[0];
-	eMH1MessageT *rx_message = &this->emh1_rx_message;
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
 
   // check LRC
   uint8_t lrc1 = ascii2uint8(&frame[at-3]);
@@ -113,14 +113,9 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 			r = ascii2uint8(&frame[5]);
 	    ESP_LOGD(TAG, "Receiving %u bytes", r);
 				for (uint8_t x = 0; x<r; x++) {
-				  rx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
+				  tx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
 				}
-  			bool found = false;
-  			for (auto *device : this->devices_) {
-    		  if (device->address_ == rx_message->DeviceId) {
-            device->on_emh1_modbus_data(rx_message->Destination, rx_message->DataLength, rx_message->Data);
-						found = true;
-      		}
+            device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
     		}
   			if (!found) {
     		  ESP_LOGW(TAG, "Got eMH1 frame from unknown device address");
