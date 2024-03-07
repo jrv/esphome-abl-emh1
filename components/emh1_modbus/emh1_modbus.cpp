@@ -237,7 +237,7 @@ void eMH1Modbus::send_current(uint8_t x) {
   char line[] = "0110002D00010200A632";
 	// 0x01 = address
 	// 0x10 = write operation
-	// 0x002D = Set Ic max
+	// 0x0014 = Set Ic max
 	// 0x0001 = 1 16-bit register
 	// 0x02 = quantity of value bytes
 	// 0x00A6 = actual value (166 = 16.6%) = 10A
@@ -248,64 +248,15 @@ void eMH1Modbus::send_current(uint8_t x) {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
-	tx_message->Destination = 0x0005;		// 
+	tx_message->Destination = 0x0014;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
-	tx_message->Data[0] = 0xE0;
-	tx_message->Data[1] = 0xE0;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	tx_message->Data[0] = 0xE2;
-	tx_message->Data[1] = 0xE2;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	tx_message->Destination = 0x002C;
-	tx_message->Data[0] = 0x50;
-	tx_message->Data[1] = 0x00;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	tx_message->Destination = 0x002D;
-	tx_message->Data[0] = 0x83;
-	tx_message->Data[1] = 0x7C;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
 	uint16_t v = std::floor(16.67*x);
-  ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
 	uint8_t v2 = 0 + (v & 0x00FF);
   ESP_LOGW(TAG, "Amp setting: 0x%02X 0x%02X", v1, v2);
 	tx_message->Data[0] = v1;
 	tx_message->Data[1] = v2;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
-	tx_message->Destination = 0x0005;		// 
-	tx_message->DataLength = 0x0001;
-	tx_message->Data[0] = 0xA1;
-	tx_message->Data[1] = 0xA1;
-	this->send();
-	delay(50);
-	this->send();
-	delay(50);
 	this->send();
 }
 
