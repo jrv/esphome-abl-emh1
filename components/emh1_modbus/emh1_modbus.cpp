@@ -344,7 +344,7 @@ void eMH1Modbus::send() {
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
 	} else {
 	  size = hexencode_ascii(tx_message->WriteBytes, buffer, size);
-	  size = hexencode_ascii(tx_message->Data, buffer, size, tx_message->writeBytes);
+	  size = hexencode_ascii(tx_message->Data, buffer, size, tx_message->WriteBytes);
 		tx_message->LRC = lrc(buffer, size);
 	  size = hexencode_ascii(tx_message->LRC, buffer, size);
   }
