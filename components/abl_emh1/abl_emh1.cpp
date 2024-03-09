@@ -68,7 +68,7 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	  ESP_LOGW(TAG, "Serial number length problem, detected %n", datalength);
 	}
   for (int x=0; x<16; x++) {
-	  ESP_LOGI(TAG, "Serial: %0x02", data[x]);
+	  ESP_LOGI(TAG, "Serial: 0x%02X", data[x]);
 	}
 /*
 	uint8_t dmax = d
