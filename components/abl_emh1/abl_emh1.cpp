@@ -64,9 +64,9 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 }
 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
-	ESP_LOGI(TAG, "Serial number size: %d", datalength*2-2);
+	ESP_LOGD(TAG, "Serial number size: %d", datalength*2-2);
   if (datalength*2-2 != 14) {
-	  ESP_LOGW(TAG, "Serial number length problem, detected %n", datalength*2-2);
+	  ESP_LOGD(TAG, "Serial number length problem, detected %n", datalength*2-2);
 	}
 	uint8_t dmax = datalength*2-2;
 	if (dmax > 14) dmax = 14;
@@ -77,8 +77,8 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	for (int x=0; x < dmax; x++) {
 	  buffer[x] += data[x+2];
 	}
-	this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
-  // this->publish_state_(this->serial_number_text_sensor_, buffer);
+	// this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
+  this->publish_state_(this->serial_number_text_sensor_, buffer);
   this->no_response_count_ = 0;
 }
 
