@@ -56,7 +56,6 @@ class eMH1ModbusDevice {
  public:
   void set_parent(eMH1Modbus *parent) { parent_ = parent; }
   void set_address(uint8_t address) { address_ = address; }
-//  void set_serial_number(uint8_t *serial_number) { serial_number_ = serial_number; }
 //  virtual void on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) = 0;
 	virtual void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) = 0;
   
@@ -70,7 +69,6 @@ class eMH1ModbusDevice {
 
   eMH1Modbus *parent_;
   uint8_t address_;
-//  uint8_t *serial_number_;
 };
 
 }  // namespace emh1_modbus
