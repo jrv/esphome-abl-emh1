@@ -4,6 +4,8 @@
 #include "esphome.h"
 #include <cmath>
 
+#define BROADCAST_ADDRESS 0xFF
+
 namespace esphome {
 namespace emh1_modbus {
 
@@ -13,6 +15,7 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
      this->flow_control_pin_->setup();
   }
+	// this->emh1_tx_message.DeviceId = 0x01;
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 	tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -28,6 +31,7 @@ void eMH1Modbus::loop() {
     this->rx_buffer_.clear();
     this->last_emh1_modbus_byte_ = now;
   }
+
   while (this->available()) {
     uint8_t byte;
     this->read_byte(&byte);
@@ -147,7 +151,75 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   ESP_LOGD(TAG, "Cleared buffer");
 
 	return true;
+	/*
+  if (at == 3)
+    return true;
+  uint8_t address = frame[3];
 
+  // Byte 9: data length
+  if (at < 9)
+    return true;
+
+  uint8_t data_len = frame[8];
+  // Byte 9...9+data_len-1: Data
+  if (at < 9 + data_len)
+    return true;
+
+  // Byte 9+data_len: CRC_LO (over all bytes)
+  if (at == 9 + data_len)
+    return true;
+
+  ESP_LOGVV(TAG, "RX <- %s", format_hex_pretty(frame, at + 1).c_str());
+
+  if (frame[0] != 0xAA || frame[1] != 0x55) {
+    ESP_LOGW(TAG, "Invalid header");
+    return false;
+  }
+
+  // Byte 9+data_len+1: CRC_HI (over all bytes)
+  uint16_t computed_checksum = 0; // removed checksum routine!
+  uint16_t remote_checksum = uint16_t(frame[9 + data_len + 1]) | (uint16_t(frame[9 + data_len]) << 8);
+  if (computed_checksum != remote_checksum) {
+    ESP_LOGW(TAG, "Invalid checksum! 0x%02X !=  0x%02X", computed_checksum, remote_checksum);
+    return false;
+  }
+
+  // data only
+  std::vector<uint8_t> data(this->rx_buffer_.begin() + 9, this->rx_buffer_.begin() + 9 + data_len);
+
+  if (address == BROADCAST_ADDRESS) {
+    // check control code && function code
+    if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
+      ESP_LOGI(TAG, "Charger discovered.");
+      // this->register_address(0x01);
+    } else {
+      ESP_LOGW(TAG, "Unknown broadcast data: %s", format_hex_pretty(&data.front(), data.size()).c_str());
+    }
+
+    // early return false to reset buffer
+    return false;
+  }
+
+  bool found = false;
+  for (auto *device : this->devices_) {
+    if (device->address_ == address) {
+      if (frame[6] == 0x11) {
+        device->on_emh1_modbus_data(frame[7], data);
+      } else {
+        // ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
+        //         format_hex_pretty(frame, at + 1).c_str());
+      }
+      found = true;
+    }
+  }
+
+  if (!found) {
+    ESP_LOGW(TAG, "Got eMH1 frame from unknown device address 0x%02X!", address);
+  }
+
+  // return false to reset buffer
+  return false;
+	*/
 }
 
 void eMH1Modbus::dump_config() {
@@ -248,7 +320,6 @@ void eMH1Modbus::send_current(uint8_t x) {
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
-	/*
 	tx_message->Destination = 0x0005;		// 
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
@@ -286,10 +357,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	delay(1);
 	this->send();
 	delay(1);
-	*/
-	tx_message->Destination = 0x0014;
-	tx_message->DataLength = 0x0001;
-	tx_message->WriteBytes = 0x02;
+	tx_message->Destination = 0x002D;
 	uint16_t v = std::floor(16.67*x);
   ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
 	uint8_t v1 = 0 + (v >> 8);
@@ -298,7 +366,6 @@ void eMH1Modbus::send_current(uint8_t x) {
 	tx_message->Data[0] = v1;
 	tx_message->Data[1] = v2;
 	this->send();
-	/*
 	delay(1);
 	this->send();
 	delay(1);
@@ -313,8 +380,51 @@ void eMH1Modbus::send_current(uint8_t x) {
 	this->send();
 	delay(1);
 	this->send();
-	*/
 }
+
+/*
+void eMH1Modbus::send_current(uint8_t x) {
+  this->flow_control_pin_->digital_write(true);
+	int y;
+	for (y=0; y<3; y++) {
+		this->write_array((const uint8_t *)":01100005000102E0E027", 21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+	for (y=0; y<3; y++) {
+ 		this->write_array((const uint8_t *)":01100005000102E2E223",21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+	for (y=0; y<3; y++) {
+ 		this->write_array((const uint8_t *)":0110002C000102500070",21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+	for (y=0; y<3; y++) {
+ 		this->write_array((const uint8_t *)":0110002D000102837CC0",21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+  for (y=0; y<3; y++) {
+ 		this->write_array((const uint8_t *)":0110002D000102014D71",21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+  for (y=0; y<3; y++) {
+ 		this->write_array((const uint8_t *)":001100005000102A1A1A",21);
+		this->write(0x0D);
+		this->write(0x0A);
+  	this->flush();
+	}
+  this->flow_control_pin_->digital_write(false);
+}
+*/
 
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
