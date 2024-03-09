@@ -177,8 +177,8 @@ void ABLeMH1::update() {
     // respond to the discovery broadcast if it's already configured.
     this->no_response_count_ = 0;
   } else {
+		this->query_status_report();
     this->no_response_count_++;
-		this->get_serial();
   }
 }
 
