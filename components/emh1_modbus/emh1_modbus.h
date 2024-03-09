@@ -35,8 +35,6 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
   void send();
   void send_current(uint8_t x);
   void query_status_report();
-  void query_device_info();
-  void query_config_settings();
   void get_serial();
   uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset);
 	uint8_t hexencode_ascii(uint16_t val, char* outStr, uint8_t offset);
@@ -56,12 +54,9 @@ class eMH1ModbusDevice {
  public:
   void set_parent(eMH1Modbus *parent) { parent_ = parent; }
   void set_address(uint8_t address) { address_ = address; }
-//  virtual void on_emh1_modbus_data(const uint8_t &function, const std::vector<uint8_t> &data) = 0;
 	virtual void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) = 0;
   
 	void query_status_report() { this->parent_->query_status_report(); }
-  void query_device_info() { this->parent_->query_device_info(); }
-  void query_config_settings() { this->parent_->query_config_settings(); }
   void get_serial() { this->parent_->get_serial(); }
 
  protected:

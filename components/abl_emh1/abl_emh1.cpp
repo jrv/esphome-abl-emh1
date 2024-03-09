@@ -7,20 +7,7 @@ namespace abl_emh1 {
 static const char *const TAG = "abl_emh1";
 
 static const uint8_t FUNCTION_STATUS_REPORT = 0x002E;
-static const uint8_t FUNCTION_DEVICE_INFO = 0x002C;
-static const uint8_t FUNCTION_CONFIG_SETTINGS = 0x0001;
 static const uint8_t FUNCTION_GET_SERIAL = 0x0050;
-
-static const uint8_t MODES_SIZE = 7;
-static const std::string MODES[MODES_SIZE] = {
-    "Wait",             // 0
-    "Check",            // 1
-    "Normal",           // 2
-    "Fault",            // 3
-    "Permanent Fault",  // 4
-    "Update",           // 5
-    "Self Test",        // 6
-};
 
 static const uint8_t STATE_SIZE = 13;
 static const char *const STATE[STATE_SIZE] = {
@@ -45,14 +32,8 @@ static const char STATECODE[STATE_SIZE] = {
 
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
   switch (function) {
-    case FUNCTION_DEVICE_INFO:
-      this->decode_device_info_(data, datalength);
-      break;
     case FUNCTION_STATUS_REPORT:
       this->decode_status_report_(data, datalength);
-      break;
-    case FUNCTION_CONFIG_SETTINGS:
-      this->decode_config_settings_(data, datalength);
       break;
     case FUNCTION_GET_SERIAL:
       this->decode_serial_number_(data, datalength);
@@ -76,36 +57,6 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	buffer[x] = '\0';
 	ESP_LOGD(TAG, "Serial number: %s", buffer);
   this->publish_state_(this->serial_number_text_sensor_, buffer);
-  this->no_response_count_ = 0;
-}
-
-void ABLeMH1::decode_device_info_(const uint8_t* data, uint16_t datalength) {
-  ESP_LOGI(TAG, "Device info frame received");
-  //ESP_LOGI(TAG, "  Device type: %d", data[0]);
-  //ESP_LOGI(TAG, "  Rated power: %s", std::string(data.begin() + 1, data.begin() + 1 + 6).c_str());
-  //ESP_LOGI(TAG, "  Firmware version: %s", std::string(data.begin() + 7, data.begin() + 7 + 5).c_str());
-  //ESP_LOGI(TAG, "  Module name: %s", std::string(data.begin() + 12, data.begin() + 12 + 14).c_str());
-  //ESP_LOGI(TAG, "  Manufacturer: %s", std::string(data.begin() + 26, data.begin() + 26 + 14).c_str());
-  //ESP_LOGI(TAG, "  Serial number: %s", std::string(data.begin() + 40, data.begin() + 40 + 14).c_str());
-  //ESP_LOGI(TAG, "  Rated bus voltage: %s", std::string(data.begin() + 54, data.begin() + 54 + 4).c_str());
-  this->no_response_count_ = 0;
-}
-
-void ABLeMH1::decode_config_settings_(const uint8_t* data, uint16_t datalength) {
-  //if (data.size() != 68) {
-  //  ESP_LOGW(TAG, "Invalid response size: %zu", data.size());
-  //  return;
-  //}
-
-//  auto emh1_get_16bit = [&](size_t i) -> uint16_t {
-//    return (uint16_t(data[i + 0]) << 8) | (uint16_t(data[i + 1]) << 0);
-//  };
-
-  ESP_LOGI(TAG, "Config settings frame received");
-  //ESP_LOGI(TAG, "  wVpvStart [9.10]: %f V", emh1_get_16bit(0) * 0.1f);
-  //ESP_LOGI(TAG, "  wTimeStart [11.12]: %d S", emh1_get_16bit(2));
-  //ESP_LOGI(TAG, "  wVacMinProtect [13.14]: %f V", emh1_get_16bit(4) * 0.1f);
-
   this->no_response_count_ = 0;
 }
 

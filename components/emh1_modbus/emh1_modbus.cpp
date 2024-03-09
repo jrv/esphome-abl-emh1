@@ -179,26 +179,6 @@ void eMH1Modbus::query_status_report() {
   this->send();
 }
 
-void eMH1Modbus::query_device_info() {
-  ESP_LOGW(TAG, "Query Device Info");
-	eMH1MessageT *tx_message = &this->emh1_tx_message;
-  tx_message->DeviceId = 0x01;
-	tx_message->FunctionCode = 0x03;
-	tx_message->Destination = 0x002C;
-	tx_message->DataLength = 0x0001;
-  this->send();
-}
-
-void eMH1Modbus::query_config_settings() {
-  ESP_LOGW(TAG, "Query Config Settings");
-	eMH1MessageT *tx_message = &this->emh1_tx_message;
-  tx_message->DeviceId = 0x01;
-	tx_message->FunctionCode = 0x03;
-	tx_message->Destination = 0x0001;
-	tx_message->DataLength = 0x0002;
-  this->send();
-}
-
 void eMH1Modbus::get_serial() {
   ESP_LOGW(TAG, "Query Serial Number");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
