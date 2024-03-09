@@ -82,10 +82,6 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   this->no_response_count_ = 0;
 }
 
-void ABLeMH1::sendcode() {
-	  ESP_LOGW(TAG, "Running function sendcode()");
-}
-
 void ABLeMH1::decode_device_info_(const uint8_t* data, uint16_t datalength) {
   ESP_LOGI(TAG, "Device info frame received");
   //ESP_LOGI(TAG, "  Device type: %d", data[0]);
@@ -137,9 +133,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
     this->publish_state_(this->l1_current_sensor_, 0.0);
     this->publish_state_(this->l2_current_sensor_, 0.0);
     this->publish_state_(this->l3_current_sensor_, 0.0);
-	  this->publish_state_(this->errors_text_sensor_, "");
   } else {
-	  this->publish_state_(this->errors_text_sensor_, "");
     this->publish_state_(this->l1_current_sensor_, 
   	  ((data[4] << 4) + data[5]) / 10.0);
     this->publish_state_(this->l2_current_sensor_,
@@ -167,7 +161,6 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->ucp_status_sensor_, NAN);
   this->publish_state_(this->outlet_state_sensor_, NAN);
   this->publish_state_(this->mode_name_text_sensor_, "Offline");
-	this->publish_state_(this->errors_text_sensor_, "Offline");
   this->publish_state_(this->serial_number_text_sensor_, "");
 }
 
@@ -232,22 +225,6 @@ void ABLeMH1::dump_config() {
 //  LOG_SENSOR("", "GFC fault", this->gfc_fault_sensor_);
 //  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_name_text_sensor_);
 //  LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
-}
-
-std::string ABLeMH1::error_bits_to_string_(const uint32_t mask) {
-  std::string values = "";
-  if (mask) {
-    for (int i = 0; i < STATE_SIZE; i++) {
-      if (mask & (1 << i)) {
-        values.append(STATE[i]);
-        values.append(";");
-      }
-    }
-    if (!values.empty()) {
-      values.pop_back();
-    }
-  }
-  return values;
 }
 
 }  // namespace abl_emh1

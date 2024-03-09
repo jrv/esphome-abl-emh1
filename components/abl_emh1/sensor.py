@@ -37,7 +37,6 @@ UNIT_HOURS = "h"
 UNIT_KILO_WATT_HOURS = "kWh"
 
 ICON_MODE = "mdi:heart-pulse"
-ICON_ERROR_BITS = "mdi:alert-circle-outline"
 
 SENSORS = [
     CONF_ENERGY_TODAY,

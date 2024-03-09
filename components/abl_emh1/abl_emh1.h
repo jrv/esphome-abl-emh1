@@ -27,10 +27,8 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_ucp_status_sensor(sensor::Sensor *ucp_status_sensor) { ucp_status_sensor_ = ucp_status_sensor; }
 	void set_outlet_state_sensor(sensor::Sensor *outlet_state_sensor) { outlet_state_sensor_ = outlet_state_sensor; }
 	void set_mode_name_text_sensor(text_sensor::TextSensor *mode_name_text_sensor) { mode_name_text_sensor_ = mode_name_text_sensor; }
-	void set_errors_text_sensor(text_sensor::TextSensor *errors_text_sensor) { errors_text_sensor_ = errors_text_sensor; }
   void set_serial_number_text_sensor(text_sensor::TextSensor *serial_number_text_sensor) { serial_number_text_sensor_ = serial_number_text_sensor; }
 
-	void sendcode();
   void update() override;
   void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
   void dump_config() override;
@@ -48,7 +46,6 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   sensor::Sensor *outlet_state_sensor_;
 
   text_sensor::TextSensor *mode_name_text_sensor_;
-  text_sensor::TextSensor *errors_text_sensor_;
   text_sensor::TextSensor *serial_number_text_sensor_;
   uint8_t no_response_count_ = REDISCOVERY_THRESHOLD;
 	uint16_t config_age_ = CONFIG_AGE_THRESHOLD;
@@ -60,7 +57,6 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   void publish_state_(sensor::Sensor *sensor, float value);
   void publish_state_(text_sensor::TextSensor *text_sensor, const std::string &state);
   void publish_device_offline_();
-  std::string error_bits_to_string_(uint32_t bitmask);
 };
 
 
