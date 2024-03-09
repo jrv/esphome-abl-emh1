@@ -64,7 +64,7 @@ void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const 
 }
 
 void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
-	ESP_LOGD(TAG, "Serial number size: %d", datalength*2-2);
+	ESP_LOGD(TAG, "Serial number: %s", data);
   if (datalength*2-2 != 14) {
 	  ESP_LOGD(TAG, "Serial number length problem, detected %n", datalength*2-2);
 	}

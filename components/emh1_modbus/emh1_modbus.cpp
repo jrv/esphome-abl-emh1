@@ -112,6 +112,16 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	  ESP_LOGW(TAG, "ERROR: Received from device ID: 0x%02X", r);
 		return false;
   }
+	bool found = false;
+	for (auto *device : this->devices_) {
+		if (device->address_ == r) {
+			found = true;
+		}
+	}
+	if (!found) {
+		ESP_LOGW(TAG, "Got eMH1 frame from unknown device address");
+		return false;
+	}
 
 	// Check Function Code
   r = ascii2uint8(&frame[3]);
@@ -126,16 +136,8 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 				for (uint8_t x = 0; x<r; x++) {
 				  tx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
 				}
-  			bool found = false;
-  			for (auto *device : this->devices_) {
-    		  if (device->address_ == tx_message->DeviceId) {
-            device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
-						found = true;
-      		}
-    		}
-  			if (!found) {
-    		  ESP_LOGW(TAG, "Got eMH1 frame from unknown device address");
-  			}
+				tx_message->Data[r] = '\0';
+			  device->on_emh1_modbus_data(tx_message->Destination, tx_message->DataLength, tx_message->Data);
 			} else {
 				ESP_LOGW(TAG, "Response data size mismatch, expected %u got %u bytes", this->emh1_tx_message.DataLength * 2, r);
 			}
