@@ -215,12 +215,12 @@ void eMH1Modbus::send_enable(uint8_t x) {
 	tx_message->DataLength = 0x0001;		// 1 16-bit register
 	tx_message->WriteBytes = 0x02;			// quantity of value bytes
 	if (x == 0) {
-		tx_message->Data[0] = A1;
-		tx_message->Data[1] = A1;
+		tx_message->Data[0] = 0xA1;
+		tx_message->Data[1] = 0xA1;
     ESP_LOGD(TAG, "Enable charger");
 	} else {
-		tx_message->Data[0] = E0;
-		tx_message->Data[1] = E0;
+		tx_message->Data[0] = 0xE0;
+		tx_message->Data[1] = 0xE0;
     ESP_LOGD(TAG, "Disable charger");
   }
 	this->send();
