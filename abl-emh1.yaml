@@ -100,6 +100,7 @@ number:
   - platform: template
     name: "Current"
     id: set_current
+    icon: mdi:arrow-oscillating
     min_value: 3
     max_value: 32
     step: 1
@@ -115,6 +116,7 @@ switch:
   - platform: template
     name: "Enable"
     id: enable_switch
+    icon: "mdi:power"
     lambda: 'return (id(outlet_state).state < 0xC5);'
     turn_on_action:
       - lambda: |-

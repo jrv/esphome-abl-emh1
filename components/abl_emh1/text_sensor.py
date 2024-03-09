@@ -10,8 +10,8 @@ DEPENDENCIES = ["abl_emh1"]
 CONF_MODE = "mode"
 CONF_SERIAL_NUMBER = "serial_number"
 
-ICON_MODE = "mdi:heart-pulse"
-ICON_SERIAL_NUMBER = "mdi:heart-pulse"
+ICON_MODE = "mdi:information"
+ICON_SERIAL_NUMBER = "mdi:information"
 
 CONFIG_SCHEMA = cv.Schema(
     {
