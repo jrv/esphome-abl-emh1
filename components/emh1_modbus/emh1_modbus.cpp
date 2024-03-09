@@ -2,9 +2,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 #include "esphome.h"
-#include <cmath>
-
-#define BROADCAST_ADDRESS 0xFF
 
 namespace esphome {
 namespace emh1_modbus {
@@ -24,6 +21,7 @@ void eMH1Modbus::setup() {
 	tx_message->WriteBytes = 0x00;
 }
 
+// loop() receives incoming replies from ABL
 void eMH1Modbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_emh1_modbus_byte_ > 50) {
@@ -70,6 +68,11 @@ uint8_t lrc(const char* value, uint8_t l) {
   return lrc_;
 }
 
+// parse_emh1_modbus_byte will read a byte from RS485
+// if it's the last byte of a transmission, it will
+// proceed to parse the buffer, trying to make sense
+// of the received package
+//
 bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 	size_t at = this->rx_buffer_.size();
   this->rx_buffer_.push_back(byte);
@@ -79,10 +82,18 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   char *frame = &this->rx_buffer_[0];
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 
-		// check contents of first byte
+	// check LRC
+	uint8_t lrc1 = ascii2uint8(&frame[at-3]);
+  uint8_t lrc2 = lrc(&frame[1], at-3);
+	if (lrc1 != lrc2) {
+		ESP_LOGW(TAG, "LRC check failed, discarding transmission");
+		return false;
+	}
+
+	// check contents of first byte
 	switch (frame[0]) {
 	  case ':':
-   	  // ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
+   	  ESP_LOGD(TAG, "Ignore Master transmission: %s", frame);
 		  return false;
 		case '>':
     	ESP_LOGD(TAG, "Received client transmission: %s", frame);
@@ -91,14 +102,6 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
       ESP_LOGW(TAG, "Unknown broadcast data: %s", frame);
 		  return false;
 	}
-
-	// check LRC
-	uint8_t lrc1 = ascii2uint8(&frame[at-3]);
-  uint8_t lrc2 = lrc(&frame[1], at-3);
-	if (lrc1 != lrc2) {
-		ESP_LOGW(TAG, "LRC check failed, discarding transmission %02X != %02X", lrc1, lrc2);
-		return false;
-	} 
 
   // Check Device ID
 	uint8_t r = ascii2uint8(&frame[1]);
@@ -203,7 +206,24 @@ void eMH1Modbus::get_serial() {
   this->send();
 }
 
-// single uint8_t value
+// set Max current
+void eMH1Modbus::send_current(uint8_t x) {
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;				// default address
+	tx_message->FunctionCode = 0x10;		// write operation
+	tx_message->Destination = 0x0014;		// Set Ic Max
+	tx_message->DataLength = 0x0001;		// 1 16-bit register
+	tx_message->WriteBytes = 0x02;			// quantity of value bytes
+	uint16_t v = std::floor(16.67*x);
+  ESP_LOGD(TAG, "Set Max Current to %d Amps (0x%04X)", x, v);
+	uint8_t v1 = 0 + (v >> 8);
+	uint8_t v2 = 0 + (v & 0x00FF);
+	tx_message->Data[0] = v1;
+	tx_message->Data[1] = v2;
+	this->send();
+}
+
+// convert single uint8_t value to hex-encoded ascii, append to outStr
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
@@ -212,7 +232,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
 	return offset+2;
 }
 
-// single uint16_t value
+// convert single uint16_t value to hex-encoded ascii, append to outStr
 uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF000) >> 12;
   uint8_t lowBits = (val & 0x0F00) >> 8;
@@ -225,7 +245,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) 
 	return offset+4;
 }
 
-// array of uint8_t values
+// convert array of uint8_t to hex-encoded ascii, append to outStr
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val[x] & 0xF0) >> 4;
@@ -236,30 +256,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 	return offset+cnt*2;
 }
 
-void eMH1Modbus::send_current(uint8_t x) {
-  // example output: :0110001400010200A632
-	// 0x01 = address
-	// 0x10 = write operation
-	// 0x0014 = Set Ic max
-	// 0x0001 = 1 16-bit register
-	// 0x02 = quantity of value bytes
-	// 0x00A6 = actual value (166 = 16.7%) = 10A
-	// 0x32 = LRC (calculated in send() command)
-	eMH1MessageT *tx_message = &this->emh1_tx_message;
-  tx_message->DeviceId = 0x01;				// default address
-	tx_message->FunctionCode = 0x10;		// write operation
-	tx_message->Destination = 0x0014;		// 
-	tx_message->DataLength = 0x0001;
-	tx_message->WriteBytes = 0x02;
-	uint16_t v = std::floor(16.67*x);
-  ESP_LOGD(TAG, "Set Max Current to %d Amps (0x%04X)", x, v);
-	uint8_t v1 = 0 + (v >> 8);
-	uint8_t v2 = 0 + (v & 0x00FF);
-	tx_message->Data[0] = v1;
-	tx_message->Data[1] = v2;
-	this->send();
-}
-
+// Send a query or command to ABL eMH1 via RS485
 void eMH1Modbus::send() {
   // Send Modbus query as ASCII text (modbus-ascii !)
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
