@@ -306,17 +306,14 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, 
 }
 
 void eMH1Modbus::send_current(uint8_t x) {
-  char line[] = "0110002D00010200A632";
+  // example output: :0110001400010200A632
 	// 0x01 = address
 	// 0x10 = write operation
-	// 0x002D = Set Ic max
+	// 0x0014 = Set Ic max
 	// 0x0001 = 1 16-bit register
 	// 0x02 = quantity of value bytes
-	// 0x00A6 = actual value (166 = 16.6%) = 10A
-	// 0x32 = LRC
-	// als Ic max = 80A, dan is 32A dus 40%
-	// en 16A is dan 20% = 00C8
-  ESP_LOGW(TAG, "Set Max Current to %d Amps", x);
+	// 0x00A6 = actual value (166 = 16.7%) = 10A
+	// 0x32 = LRC (calculated in send() command)
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;				// default address
 	tx_message->FunctionCode = 0x10;		// write operation
@@ -324,7 +321,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	tx_message->DataLength = 0x0001;
 	tx_message->WriteBytes = 0x02;
 	uint16_t v = std::floor(16.67*x);
-  ESP_LOGW(TAG, "Amp setting: 0x%04X", v);
+  ESP_LOGD(TAG, "Set Max Current to %d Amps (0x%04X)", x, v);
 	uint8_t v1 = 0 + (v >> 8);
 	uint8_t v2 = 0 + (v & 0x00FF);
 	tx_message->Data[0] = v1;
