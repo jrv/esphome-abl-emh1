@@ -74,22 +74,8 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 		x++;
 	}
 	buffer[x] = '\0';
-	ESP_LOGI(TAG, "Serial: %s", buffer);
-	
-/*
-	uint8_t dmax = d
-	if (dmax > 14) dmax = 14;
-	for (int x=2; x<16; x++) {
-	  buffer[x] = chr(data[x+2]);
-	}
-	char buffer[15] = '\0';
-	for (int x=0; x < dmax; x++) {
-	  buffer[x] += data[x+2];
-	}
-	// this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
-  // this->publish_state_(this->serial_number_text_sensor_, buffer);
-	ESP_LOGD(TAG, "Serial number: %s", data);
-	*/
+	ESP_LOGD(TAG, "Serial number: %s", buffer);
+  this->publish_state_(this->serial_number_text_sensor_, buffer);
   this->no_response_count_ = 0;
 }
 
