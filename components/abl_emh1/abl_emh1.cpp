@@ -77,7 +77,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
   this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
   this->publish_state_(this->ucp_status_sensor_, (data[2] & 0x80) >> 7);
-	if (STATECODE[x] == 0xA1) {
+	if ((STATECODE[x] == 0xA1) || (STATECODE[X] == 0xE0)) {
     this->publish_state_(this->l1_current_sensor_, 0.0);
     this->publish_state_(this->l2_current_sensor_, 0.0);
     this->publish_state_(this->l3_current_sensor_, 0.0);
