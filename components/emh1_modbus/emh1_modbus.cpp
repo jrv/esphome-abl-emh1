@@ -113,6 +113,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 			r = ascii2uint8(&frame[5]);
 	    ESP_LOGD(TAG, "Receiving %u bytes", r);
 			if (r == rx_message->DataLength * 2) {
+				// ESP_LOGD(TAG, "Send data upwards");
 				for (uint8_t x = 0; x<r; x++) {
 				  rx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
 				}
@@ -127,7 +128,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
     		  ESP_LOGW(TAG, "Got eMH1 frame from unknown device address");
   			}
 			} else {
-				ESP_LOGW(TAG, "Response data size mismatch, expected %u got %u bytes", rx_message->DataLength * 2, r);
+				ESP_LOGW(TAG, "Response data size mismatch, expected %u got %u bytes", this->emh1_rx_message.DataLength * 2, r);
 			}
 			break;
 		case 0x10:
@@ -203,7 +204,7 @@ void eMH1Modbus::get_serial() {
 // TODO: kijk of het zonder de bovenste twee hexencode_ascii definities kan?!
 
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
-  ESP_LOGW(TAG, "Using hexencode_ascii 1");
+  ESP_LOGW("Using hexencode_ascii 1");
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -212,7 +213,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
 }
 
 uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
-  ESP_LOGW(TAG, "Using hexencode_ascii 2");
+  ESP_LOGW("Using hexencode_ascii 2");
   uint8_t highBits = (val & 0xF000) >> 12;
   uint8_t lowBits = (val & 0x0F00) >> 8;
   outStr[offset] = (highBits > 0x09)?(highBits+55):(highBits+48);
@@ -225,7 +226,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) 
 }
 
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
-  ESP_LOGW(TAG, "Using hexencode_ascii 3");
+  ESP_LOGW("Using hexencode_ascii 3");
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val[x] & 0xF0) >> 4;
     uint8_t lowBits = (val[x] & 0x0F);
