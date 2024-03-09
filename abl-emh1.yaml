@@ -91,6 +91,7 @@ number:
     step: 1
     optimistic: false
     lambda: 'return abs(id(max_current).state);'
+    update_interval: 1s
     set_action:
       lambda: |-
         ESP_LOGD("main", "Sending modbus value = %d", abs(x));
