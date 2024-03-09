@@ -126,6 +126,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
 				for (uint8_t x = 0; x<r; x++) {
 				  tx_message->Data[x] = ascii2uint8(&frame[7+x*2]);
 				}
+				tx_message->Data[r] = '\0';
   			bool found = false;
   			for (auto *device : this->devices_) {
     		  if (device->address_ == tx_message->DeviceId) {
