@@ -53,65 +53,67 @@ abl_emh1:
 
 text_sensor:
   - platform: abl_emh1
-    mode_name:
-      name: "${name} mode name"
+    mode:
+      name: "Status"
     serial_number:
       name: "${name} Serial number"
+      disabled_by_default: true
+
 
 sensor:
   - platform: abl_emh1
     l1_current:
-      name: "${name} L1 current"
+      name: "L1 current"
       state_class: "measurement"
       accuracy_decimals: 0
     l2_current:
-      name: "${name} L2 current"
+      name: "L2 current"
       state_class: "measurement"
       accuracy_decimals: 0
     l3_current:
-      name: "${name} L3 current"
+      name: "L3 current"
       state_class: "measurement"
       accuracy_decimals: 0
     max_current:
-      name: "${name} Max current"
+      name: "Max current"
       state_class: "measurement"
       id: max_current
       accuracy_decimals: 0
     en1_status:
-      name: "${name} EN1 status"
+      name: "EN1 status"
       disabled_by_default: true 
     en2_status:
-      name: "${name} EN2 status"
+      name: "EN2 status"
       disabled_by_default: true 
     duty_cycle_reduced:
-      name: "${name} Reduced Duty Cycle (max_current)"
+      name: "Reduced Duty Cycle (max_current)"
       disabled_by_default: true 
     ucp_status:
-      name: "${name} Ucp Status <= 10V"
+      name: "Ucp Status <= 10V"
       disabled_by_default: true 
     outlet_state:
-      name: "${name} Outlet state"
+      name: "Outlet state"
       disabled_by_default: true
       id: outlet_state
 
 number:
   - platform: template
-    name: "${name} Set current"
+    name: "Current"
     id: set_current
     min_value: 3
     max_value: 32
     step: 1
     optimistic: false
-    lambda: 'return abs(id(max_current).state);'
+    lambda: 'return std::lround(id(max_current).state);'
     update_interval: 1s
     set_action:
       lambda: |-
-        ESP_LOGD("main", "Sending modbus value = %d", abs(x));
-        id(modbus0)->send_current(abs(x));
+        ESP_LOGD("main", "Sending modbus value = %d", std::lround(x));
+        id(modbus0)->send_current(std::lround(x));
 
 switch:
   - platform: template
-    name: "${name} Enable Switch"
+    name: "Enable"
     id: enable_switch
     lambda: 'return (id(outlet_state).state < 0xC5);'
     turn_on_action:
