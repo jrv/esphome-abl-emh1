@@ -181,6 +181,7 @@ void ABLeMH1::update() {
     this->no_response_count_ = 0;
   } else {
     this->no_response_count_++;
+		this->get_serial();
     this->query_status_report();
   }
 }
