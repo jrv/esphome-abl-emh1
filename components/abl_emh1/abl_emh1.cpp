@@ -78,7 +78,7 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
 	  buffer[x] += data[x+2];
 	}
 	// this->publish_state_(this->serial_number_text_sensor_, "2W22xy01234567");
-  this->publish_state_(this->serial_number_text_sensor_, buffer);
+  // this->publish_state_(this->serial_number_text_sensor_, buffer);
   this->no_response_count_ = 0;
 }
 
