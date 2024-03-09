@@ -17,3 +17,16 @@ Some more output (like the serial number) is available in hidden entities.
 - Esp Ground connected to the GND pin from connector X10 on the ABL eMH1 circuit board. This helps avoiding noise on the RS485.
 - RJ45 plug: pin 1 and 2 connected to SN75176, no other pins connected
 
+### More info, questions
+
+Check out this thread on the Home Assistant community forum:
+https://community.home-assistant.io/t/modbus-ascii/633521
+
+### Disclaimer
+Using this component requires you to connect consumer electronics
+inside your ABL eMH1 Wallbox. There's also ~380V in that box, so
+please make sure you know what your doing. 
+
+This code was tested by trail and error, it might blow a fuse or two.
+Connecting this to your electricity network and your care is your own
+responsibility.
