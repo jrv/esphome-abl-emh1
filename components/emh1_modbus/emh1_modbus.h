@@ -34,6 +34,7 @@ class eMH1Modbus : public uart::UARTDevice, public Component {
 
   void send();
   void send_current(uint8_t x);
+  void send_enable(uint8_t x);
   void query_status_report();
   void get_serial();
   uint8_t hexencode_ascii(uint8_t val, char* outStr, uint8_t offset);

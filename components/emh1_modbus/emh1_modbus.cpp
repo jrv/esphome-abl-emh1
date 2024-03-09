@@ -206,6 +206,26 @@ void eMH1Modbus::send_current(uint8_t x) {
 	this->send();
 }
 
+// send enable/disable
+void eMH1Modbus::send_enable(uint8_t x) {
+	eMH1MessageT *tx_message = &this->emh1_tx_message;
+  tx_message->DeviceId = 0x01;				// default address
+	tx_message->FunctionCode = 0x10;		// write operation
+	tx_message->Destination = 0x0005;		// Set Ic Max
+	tx_message->DataLength = 0x0001;		// 1 16-bit register
+	tx_message->WriteBytes = 0x02;			// quantity of value bytes
+	if (x == 0) {
+		tx_message->Data[0] = A1;
+		tx_message->Data[1] = A1;
+    ESP_LOGD(TAG, "Enable charger");
+	} else {
+		tx_message->Data[0] = E0;
+		tx_message->Data[1] = E0;
+    ESP_LOGD(TAG, "Disable charger");
+  }
+	this->send();
+}
+
 // convert single uint8_t value to hex-encoded ascii, append to outStr
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
