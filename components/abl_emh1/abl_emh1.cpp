@@ -67,13 +67,19 @@ void ABLeMH1::decode_serial_number_(const uint8_t* data, uint16_t datalength) {
   if (datalength != 8) {
 	  ESP_LOGW(TAG, "Serial number length problem, detected %n", datalength);
 	}
-  for (int x=0; x<16; x++) {
-	  ESP_LOGI(TAG, "Serial: 0x%02X", data[x]);
+  char buffer[15];
+  for (int x=2; x<16; x++) {
+	  if (data[x] == 0x20) 
+		  buffer[x] = '\0';
+	  else
+		  buffer[x] = data[x];
 	}
+	buffer[14] = '\0';
+	ESP_LOGI(TAG, "Serial: %s", buffer);
+	
 /*
 	uint8_t dmax = d
 	if (dmax > 14) dmax = 14;
-  char buffer[15];
 	for (int x=2; x<16; x++) {
 	  buffer[x] = chr(data[x+2]);
 	}
