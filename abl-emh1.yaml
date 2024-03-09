@@ -92,6 +92,7 @@ sensor:
     outlet_state:
       name: "${name} Outlet state"
       disabled_by_default: true
+      id: outlet_state
 
 number:
   - platform: template
@@ -107,3 +108,17 @@ number:
       lambda: |-
         ESP_LOGD("main", "Sending modbus value = %d", abs(x));
         id(modbus0)->send_current(abs(x));
+
+switch:
+  - platform: template
+    name: "${name} Enable Switch"
+    id: enable_switch
+    lambda: 'return (id(outlet_state).state < 0xC5);'
+    turn_on_action:
+      - lambda: |-
+          ESP_LOGD("main", "Enable switch triggered");
+          id(modbus0)->send_enable(0);
+    turn_off_action:
+      - lambda: |-
+          ESP_LOGD("main", "Enable switch triggered");
+          id(modbus0)->send_enable(1); 
