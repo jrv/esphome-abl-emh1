@@ -2,7 +2,6 @@ import esphome.codegen as cg
 from esphome.components import sensor
 import esphome.config_validation as cv
 from esphome.const import (
-    CONF_MODE,
     DEVICE_CLASS_CURRENT,
     DEVICE_CLASS_EMPTY,
     DEVICE_CLASS_ENERGY,
@@ -124,13 +123,6 @@ CONFIG_SCHEMA = cv.Schema(
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_EMPTY,
         ),
-        cv.Optional(CONF_MODE): sensor.sensor_schema(
-            unit_of_measurement=UNIT_EMPTY,
-            icon=ICON_MODE,
-            accuracy_decimals=0,
-            device_class=DEVICE_CLASS_EMPTY,
-        ),
-
     }
 )
 

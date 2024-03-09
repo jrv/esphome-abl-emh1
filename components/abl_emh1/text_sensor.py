@@ -7,19 +7,19 @@ from . import CONF_ABL_EMH1_ID, ABLeMH1
 
 DEPENDENCIES = ["abl_emh1"]
 
-CONF_MODE_NAME = "mode_name"
+CONF_MODE = "mode"
 CONF_SERIAL_NUMBER = "serial_number"
 
-ICON_MODE_NAME = "mdi:heart-pulse"
+ICON_MODE = "mdi:heart-pulse"
 ICON_SERIAL_NUMBER = "mdi:heart-pulse"
 
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_ABL_EMH1_ID): cv.use_id(ABLeMH1),
-        cv.Optional(CONF_MODE_NAME): text_sensor.TEXT_SENSOR_SCHEMA.extend(
+        cv.Optional(CONF_MODE): text_sensor.TEXT_SENSOR_SCHEMA.extend(
             {
                 cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                cv.Optional(CONF_ICON, default=ICON_MODE_NAME): cv.icon,
+                cv.Optional(CONF_ICON, default=ICON_MODE): cv.icon,
             }
         ),
         cv.Optional(CONF_SERIAL_NUMBER): text_sensor.TEXT_SENSOR_SCHEMA.extend(
@@ -34,7 +34,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 async def to_code(config):
     hub = await cg.get_variable(config[CONF_ABL_EMH1_ID])
-    for key in [CONF_MODE_NAME, CONF_SERIAL_NUMBER]:
+    for key in [CONF_MODE, CONF_SERIAL_NUMBER]:
         if key in config:
             conf = config[key]
             sens = cg.new_Pvariable(conf[CONF_ID])

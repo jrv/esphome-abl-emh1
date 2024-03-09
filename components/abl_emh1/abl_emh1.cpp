@@ -72,7 +72,7 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
 	}
   this->publish_state_(this->outlet_state_sensor_, STATECODE[x]);
   this->publish_state_(this->mode_sensor_, STATECODE[x]);
-  this->publish_state_(this->mode_name_text_sensor_, STATE[x]);
+  this->publish_state_(this->mode_text_sensor_, STATE[x]);
   this->publish_state_(this->en1_status_sensor_, (data[2] & 0x10) >> 4);
   this->publish_state_(this->en2_status_sensor_, (data[2] & 0x20) >> 5);
   this->publish_state_(this->duty_cycle_reduced_, (data[2] & 0x40) >> 6);
@@ -108,7 +108,7 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->duty_cycle_reduced_, NAN);
   this->publish_state_(this->ucp_status_sensor_, NAN);
   this->publish_state_(this->outlet_state_sensor_, NAN);
-  this->publish_state_(this->mode_name_text_sensor_, "Offline");
+  this->publish_state_(this->mode_text_sensor_, "Offline");
   this->publish_state_(this->serial_number_text_sensor_, "");
 }
 
@@ -171,7 +171,7 @@ void ABLeMH1::dump_config() {
 //  LOG_SENSOR("", "PV1 voltage fault", this->pv1_voltage_fault_sensor_);
 //  LOG_SENSOR("", "PV2 voltage fault", this->pv2_voltage_fault_sensor_);
 //  LOG_SENSOR("", "GFC fault", this->gfc_fault_sensor_);
-//  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_name_text_sensor_);
+//  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_text_sensor_);
 //  LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
 }
 
