@@ -56,7 +56,7 @@ text_sensor:
     mode:
       name: "Status"
     serial_number:
-      name: "${name} Serial number"
+      name: "Serial number"
       disabled_by_default: true
 
 
