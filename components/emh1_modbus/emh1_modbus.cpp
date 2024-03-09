@@ -307,6 +307,7 @@ void eMH1Modbus::send_current(uint8_t x) {
 	this->send();
 	delay(1);
 	this->send();
+	*/
 }
 
 void eMH1Modbus::send() {
