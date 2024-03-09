@@ -15,7 +15,6 @@ void eMH1Modbus::setup() {
   if (this->flow_control_pin_ != nullptr) {
      this->flow_control_pin_->setup();
   }
-	// this->emh1_tx_message.DeviceId = 0x01;
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
 	tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -151,75 +150,6 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
   ESP_LOGD(TAG, "Cleared buffer");
 
 	return true;
-	/*
-  if (at == 3)
-    return true;
-  uint8_t address = frame[3];
-
-  // Byte 9: data length
-  if (at < 9)
-    return true;
-
-  uint8_t data_len = frame[8];
-  // Byte 9...9+data_len-1: Data
-  if (at < 9 + data_len)
-    return true;
-
-  // Byte 9+data_len: CRC_LO (over all bytes)
-  if (at == 9 + data_len)
-    return true;
-
-  ESP_LOGVV(TAG, "RX <- %s", format_hex_pretty(frame, at + 1).c_str());
-
-  if (frame[0] != 0xAA || frame[1] != 0x55) {
-    ESP_LOGW(TAG, "Invalid header");
-    return false;
-  }
-
-  // Byte 9+data_len+1: CRC_HI (over all bytes)
-  uint16_t computed_checksum = 0; // removed checksum routine!
-  uint16_t remote_checksum = uint16_t(frame[9 + data_len + 1]) | (uint16_t(frame[9 + data_len]) << 8);
-  if (computed_checksum != remote_checksum) {
-    ESP_LOGW(TAG, "Invalid checksum! 0x%02X !=  0x%02X", computed_checksum, remote_checksum);
-    return false;
-  }
-
-  // data only
-  std::vector<uint8_t> data(this->rx_buffer_.begin() + 9, this->rx_buffer_.begin() + 9 + data_len);
-
-  if (address == BROADCAST_ADDRESS) {
-    // check control code && function code
-    if (frame[6] == 0x10 && frame[7] == 0x80 && data.size() == 14) {
-      ESP_LOGI(TAG, "Charger discovered.");
-      // this->register_address(0x01);
-    } else {
-      ESP_LOGW(TAG, "Unknown broadcast data: %s", format_hex_pretty(&data.front(), data.size()).c_str());
-    }
-
-    // early return false to reset buffer
-    return false;
-  }
-
-  bool found = false;
-  for (auto *device : this->devices_) {
-    if (device->address_ == address) {
-      if (frame[6] == 0x11) {
-        device->on_emh1_modbus_data(frame[7], data);
-      } else {
-        // ESP_LOGW(TAG, "Unhandled control code (%d) of frame for address 0x%02X: %s", frame[6], address,
-        //         format_hex_pretty(frame, at + 1).c_str());
-      }
-      found = true;
-    }
-  }
-
-  if (!found) {
-    ESP_LOGW(TAG, "Got eMH1 frame from unknown device address 0x%02X!", address);
-  }
-
-  // return false to reset buffer
-  return false;
-	*/
 }
 
 void eMH1Modbus::dump_config() {
@@ -234,6 +164,7 @@ float eMH1Modbus::get_setup_priority() const {
 }
 
 void eMH1Modbus::query_status_report() {
+  ESP_LOGW(TAG, "Query Status Report");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -243,7 +174,7 @@ void eMH1Modbus::query_status_report() {
 }
 
 void eMH1Modbus::query_device_info() {
-  ESP_LOGW(TAG, "Query: Query Device Info");
+  ESP_LOGW(TAG, "Query Device Info");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -253,7 +184,7 @@ void eMH1Modbus::query_device_info() {
 }
 
 void eMH1Modbus::query_config_settings() {
-  ESP_LOGW(TAG, "Query: Query Config Settings");
+  ESP_LOGW(TAG, "Query Config Settings");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -263,8 +194,7 @@ void eMH1Modbus::query_config_settings() {
 }
 
 void eMH1Modbus::get_serial() {
-  // broadcast query for serial number
-  ESP_LOGW(TAG, "Query: Get Serial Number");
+  ESP_LOGW(TAG, "Query Serial Number");
 	eMH1MessageT *tx_message = &this->emh1_tx_message;
   tx_message->DeviceId = 0x01;
 	tx_message->FunctionCode = 0x03;
@@ -273,8 +203,7 @@ void eMH1Modbus::get_serial() {
   this->send();
 }
 
-// TODO: kijk of het zonder de bovenste twee hexencode_ascii definities kan?!
-
+// single uint8_t value
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF0) >> 4;
   uint8_t lowBits = (val & 0x0F);
@@ -283,6 +212,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint8_t val, char* outStr, uint8_t offset) {
 	return offset+2;
 }
 
+// single uint16_t value
 uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) {
   uint8_t highBits = (val & 0xF000) >> 12;
   uint8_t lowBits = (val & 0x0F00) >> 8;
@@ -295,6 +225,7 @@ uint8_t eMH1Modbus::hexencode_ascii(uint16_t val, char* outStr, uint8_t offset) 
 	return offset+4;
 }
 
+// array of uint8_t values
 uint8_t eMH1Modbus::hexencode_ascii(uint8_t* val, char* outStr, uint8_t offset, uint8_t cnt) {
   for (uint8_t x=0; x<cnt; x++) { 
     uint8_t highBits = (val[x] & 0xF0) >> 4;
