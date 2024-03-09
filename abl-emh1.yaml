@@ -55,8 +55,6 @@ text_sensor:
   - platform: abl_emh1
     mode_name:
       name: "${name} mode name"
-    errors:
-      name: "${name} errors"
     serial_number:
       name: "${name} Serial number"
 
@@ -64,23 +62,36 @@ sensor:
   - platform: abl_emh1
     l1_current:
       name: "${name} L1 current"
+      state_class: "measurement"
+      accuracy_decimals: 0
     l2_current:
       name: "${name} L2 current"
+      state_class: "measurement"
+      accuracy_decimals: 0
     l3_current:
       name: "${name} L3 current"
+      state_class: "measurement"
+      accuracy_decimals: 0
     max_current:
       name: "${name} Max current"
+      state_class: "measurement"
       id: max_current
+      accuracy_decimals: 0
     en1_status:
       name: "${name} EN1 status"
+      disabled_by_default: true 
     en2_status:
       name: "${name} EN2 status"
+      disabled_by_default: true 
     duty_cycle_reduced:
       name: "${name} Reduced Duty Cycle (max_current)"
+      disabled_by_default: true 
     ucp_status:
       name: "${name} Ucp Status <= 10V"
+      disabled_by_default: true 
     outlet_state:
       name: "${name} Outlet state"
+      disabled_by_default: true
 
 number:
   - platform: template
@@ -96,4 +107,3 @@ number:
       lambda: |-
         ESP_LOGD("main", "Sending modbus value = %d", abs(x));
         id(modbus0)->send_current(abs(x));
-           
