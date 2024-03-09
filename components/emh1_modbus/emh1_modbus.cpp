@@ -74,7 +74,7 @@ bool eMH1Modbus::parse_emh1_modbus_byte_(uint8_t byte) {
     return true;
   this->rx_buffer_.push_back('\0');
   char *frame = &this->rx_buffer_[0];
-	eMH1MessageT *rx_message = &this->emh1_rx_message;
+  eMH1MessageT *rx_message;
 
   // check LRC
   uint8_t lrc1 = ascii2uint8(&frame[at-3]);
