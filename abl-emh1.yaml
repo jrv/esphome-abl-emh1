@@ -90,9 +90,9 @@ number:
     max_value: 32
     step: 1
     optimistic: false
-    lambda: 'return id(max_current).state;'
+    lambda: 'return abs(id(max_current).state);'
     set_action:
       lambda: |-
-        ESP_LOGD("main", "Sending modbus value = %f", x);
-        id(modbus0)->send_current(x);
+        ESP_LOGD("main", "Sending modbus value = %d", abs(x));
+        id(modbus0)->send_current(abs(x));
            
