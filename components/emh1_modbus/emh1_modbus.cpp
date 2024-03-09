@@ -40,6 +40,7 @@ void eMH1Modbus::loop() {
   }
 }
 
+// convert char[2] hexencoded ascii to a single uint8_t value
 uint8_t ascii2uint8(const char* value) {
   char c1 = value[0];
   uint8_t highBits = (c1 > '9')?(c1-55):(c1-48);
@@ -48,6 +49,7 @@ uint8_t ascii2uint8(const char* value) {
   return (highBits << 4 | lowBits);
 }
 
+// convert char[4] hexencoded ascii to a single uint16_t value
 uint16_t ascii2uint16(const char* value) {
   uint16_t res = 0;
   char c;
@@ -60,6 +62,7 @@ uint16_t ascii2uint16(const char* value) {
   return res;
 }
 
+// calculate LRC checksum over char[], result is single uint8_t value
 uint8_t lrc(const char* value, uint8_t l) {
   uint8_t lrc_ = 0;
   for (int i = 0; i < l-1; i = i + 2) {
