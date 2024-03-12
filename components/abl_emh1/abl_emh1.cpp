@@ -30,10 +30,6 @@ static const char STATECODE[STATE_SIZE] = {
 	0xE0, 0xE1, 0xE2, 0xE3, 0xF1, 0xF2, 0x00
 };
 
-void ABLeMH1::setup() {
-  EEPROM.begin(EEPROM_SIZE);
-}
-
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
   switch (function) {
     case FUNCTION_STATUS_REPORT:
