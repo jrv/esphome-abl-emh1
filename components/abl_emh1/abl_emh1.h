@@ -4,12 +4,19 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/emh1_modbus/emh1_modbus.h"
+#include <EEPROM.h>
 
 namespace esphome {
 namespace abl_emh1 {
 
 static const uint8_t REDISCOVERY_THRESHOLD = 5;
 static const uint16_t CONFIG_AGE_THRESHOLD = 10;
+
+// store total use kwH
+// calculation in MilliWattH
+// max_value is 10 years of 100kW/day = 10*365*24*100000000 = 8760000000000
+// one byte is for storing state
+#define EEPROM_SIZE 9
 
 // class ABLeMH1;
 // ABLeMH1 *my_abl_emh1;
@@ -29,7 +36,8 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_mode_text_sensor(text_sensor::TextSensor *mode_text_sensor) { mode_text_sensor_ = mode_text_sensor; }
   void set_serial_number_text_sensor(text_sensor::TextSensor *serial_number_text_sensor) { serial_number_text_sensor_ = serial_number_text_sensor; }
 
-  void update() override;
+  void setup() override;
+	void update() override;
   void on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) override;
   void dump_config() override;
 
