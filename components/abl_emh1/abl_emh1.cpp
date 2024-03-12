@@ -108,6 +108,7 @@ void ABLeMH1::publish_device_offline_() {
   this->publish_state_(this->duty_cycle_reduced_, NAN);
   this->publish_state_(this->ucp_status_sensor_, NAN);
   this->publish_state_(this->outlet_state_sensor_, 0x00);
+  this->publish_state_(this->energy_consumed_sensor_, energy_consumed_st);
   this->publish_state_(this->mode_text_sensor_, "Offline");
   this->publish_state_(this->serial_number_text_sensor_, "");
 }

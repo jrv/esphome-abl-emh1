@@ -20,8 +20,7 @@ from . import CONF_ABL_EMH1_ID, ABLeMH1
 
 DEPENDENCIES = ["abl_emh1"]
 
-CONF_ENERGY_TODAY = "energy_today"
-CONF_ENERGY_TOTAL = "energy_total"
+CONF_ENERGY_CONSUMED = "energy_consumed"
 CONF_L1_CURRENT = "l1_current"
 CONF_L2_CURRENT = "l2_current"
 CONF_L3_CURRENT = "l3_current"
@@ -38,8 +37,7 @@ UNIT_KILO_WATT_HOURS = "kWh"
 ICON_MODE = "mdi:information"
 
 SENSORS = [
-    CONF_ENERGY_TODAY,
-    CONF_ENERGY_TOTAL,
+    CONF_ENERGY_CONSUMED,
 		CONF_L1_CURRENT,
 		CONF_L2_CURRENT,
 		CONF_L3_CURRENT,
@@ -55,14 +53,7 @@ SENSORS = [
 CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_ABL_EMH1_ID): cv.use_id(ABLeMH1),
-        cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
-            unit_of_measurement=UNIT_KILO_WATT_HOURS,
-            icon=ICON_COUNTER,
-            accuracy_decimals=1,
-            device_class=DEVICE_CLASS_ENERGY,
-            state_class=STATE_CLASS_TOTAL_INCREASING,
-        ),
-        cv.Optional(CONF_ENERGY_TOTAL): sensor.sensor_schema(
+        cv.Optional(CONF_ENERGY_CONSUMED): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILO_WATT_HOURS,
             icon=ICON_COUNTER,
             accuracy_decimals=1,
