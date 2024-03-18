@@ -83,11 +83,11 @@ void ABLeMH1::decode_status_report_(const uint8_t* data, uint16_t datalength) {
     this->publish_state_(this->l3_current_sensor_, 0.0);
   } else {
     this->publish_state_(this->l1_current_sensor_, 
-  	  ((data[4] << 4) + data[5]) / 10.0);
+  	  ((data[4] << 8) + data[5]) / 10.0);
     this->publish_state_(this->l2_current_sensor_,
-      ((data[6] << 4) + data[7]) / 10.0);
+      ((data[6] << 8) + data[7]) / 10.0);
     this->publish_state_(this->l3_current_sensor_, 
-  	  ((data[8] << 4) + data[9]) / 10.0);
+  	  ((data[8] << 8) + data[9]) / 10.0);
 	}
 	uint8_t v1 = data[2] & 0x03;
 	uint8_t v2 = data[3];
