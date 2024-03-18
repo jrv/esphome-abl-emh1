@@ -150,29 +150,17 @@ void ABLeMH1::publish_state_(text_sensor::TextSensor *text_sensor, const std::st
 void ABLeMH1::dump_config() {
   ESP_LOGCONFIG(TAG, "ABLeMH1:");
   ESP_LOGCONFIG(TAG, "  Address: 0x%02X", this->address_);
-//  LOG_SENSOR("", "Temperature", this->temperature_sensor_);
-//  LOG_SENSOR("", "Energy today", this->energy_today_sensor_);
-//  LOG_SENSOR("", "DC1 voltage", this->dc1_voltage_sensor_);
-//  LOG_SENSOR("", "DC2 voltage", this->dc2_voltage_sensor_);
-//  LOG_SENSOR("", "DC1 current", this->dc1_current_sensor_);
-//  LOG_SENSOR("", "DC2 current", this->dc2_current_sensor_);
-//  LOG_SENSOR("", "AC current", this->ac_current_sensor_);
-//  LOG_SENSOR("", "AC voltage", this->ac_voltage_sensor_);
-//  LOG_SENSOR("", "AC frequency", this->ac_frequency_sensor_);
-//  LOG_SENSOR("", "AC power", this->ac_power_sensor_);
-//  LOG_SENSOR("", "Energy total", this->energy_total_sensor_);
-//  LOG_SENSOR("", "Runtime total", this->runtime_total_sensor_);
-//  LOG_SENSOR("", "Mode", this->mode_sensor_);
-//  LOG_SENSOR("", "Error bits", this->error_bits_sensor_);
-//  LOG_SENSOR("", "Grid voltage fault", this->grid_voltage_fault_sensor_);
-//  LOG_SENSOR("", "Grid frequency fault", this->grid_frequency_fault_sensor_);
-//  LOG_SENSOR("", "DC injection fault", this->dc_injection_fault_sensor_);
-//  LOG_SENSOR("", "Temperature fault", this->temperature_fault_sensor_);
-//  LOG_SENSOR("", "PV1 voltage fault", this->pv1_voltage_fault_sensor_);
-//  LOG_SENSOR("", "PV2 voltage fault", this->pv2_voltage_fault_sensor_);
-//  LOG_SENSOR("", "GFC fault", this->gfc_fault_sensor_);
-//  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_text_sensor_);
-//  LOG_TEXT_SENSOR("  ", "Errors", this->errors_text_sensor_);
+  LOG_SENSOR("", "Outlet State", this->outlet_state_sensor_);
+  LOG_SENSOR("", "Mode", this->mode_sensor_);
+  LOG_SENSOR("", "EN1 Status", this->en1_status_sensor_);
+  LOG_SENSOR("", "EN2 Status", this->en2_status_sensor_);
+  LOG_SENSOR("", "Duty cycle reduced", this->duty_cycle_reduced_);
+  LOG_SENSOR("", "UCP Status", this->ucp_status_sensor_);
+  LOG_SENSOR("", "L1 Current", this->l1_current_sensor_);
+  LOG_SENSOR("", "L2 Current", this->l2_current_sensor_);
+  LOG_SENSOR("", "L3 Current", this->l3_current_sensor_);
+  LOG_SENSOR("", "Max current", this->max_current_sensor_);
+  LOG_TEXT_SENSOR("  ", "Mode name", this->mode_text_sensor_);
 }
 
 }  // namespace abl_emh1
