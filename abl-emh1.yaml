@@ -1,7 +1,7 @@
 substitutions:
   name: abl_emh1
   device_description: "Monitor and configure ABL eMH1 Charger via RS485/Modbus-ASCII"
-  external_components_source: github://jrv/esphome-abl-emh1
+  external_components_source: https://github.com/jrv/esphome-abl-emh1
   tx_pin: "17"
   rx_pin: "16"
   flow_control_pin: "5"
@@ -18,8 +18,11 @@ esp32:
   board: esp32dev
 
 external_components:
-  - source: ${external_components_source}
-    refresh: 0s
+  source:
+    type: git
+    url: ${external_components_source}
+    ref: main
+  refresh: 0s
 
 wifi:
   ssid: !secret wifi_ssid
@@ -51,6 +54,9 @@ abl_emh1:
   emh1_modbus_id: modbus0
   update_interval: 5s
 
+preferences:
+  flash_write_interval: 5min
+
 text_sensor:
   - platform: abl_emh1
     mode:
@@ -66,14 +72,17 @@ sensor:
       name: "L1 current"
       state_class: "measurement"
       accuracy_decimals: 0
+      id: l1_current
     l2_current:
       name: "L2 current"
       state_class: "measurement"
       accuracy_decimals: 0
+      id: l2_current
     l3_current:
       name: "L3 current"
       state_class: "measurement"
       accuracy_decimals: 0
+      id: l3_current
     max_current:
       name: "Max current"
       state_class: "measurement"
@@ -117,12 +126,11 @@ switch:
     name: "Enable"
     id: enable_switch
     icon: "mdi:power"
-    lambda: 'return (id(outlet_state).state < 0xC5);'
+    lambda: 'return (id(outlet_state).state != 0xE0);'
+
     turn_on_action:
       - lambda: |-
-          ESP_LOGD("main", "Enable switch triggered");
-          id(modbus0)->send_enable(0);
+          id(modbus0)->send_enable(1);
     turn_off_action:
       - lambda: |-
-          ESP_LOGD("main", "Enable switch triggered");
-          id(modbus0)->send_enable(1); 
+          id(modbus0)->send_enable(0); 
