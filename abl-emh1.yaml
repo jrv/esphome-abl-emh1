@@ -104,6 +104,11 @@ sensor:
       name: "Outlet state"
       disabled_by_default: true
       id: outlet_state
+  - platform: uptime
+    name: Uptime Sensor
+    id: abl_uptime
+    update_interval: 15s
+
 
 number:
   - platform: template
@@ -127,10 +132,12 @@ switch:
     id: enable_switch
     icon: "mdi:power"
     lambda: 'return (id(outlet_state).state != 0xE0);'
-
-    turn_on_action:
+    turn_off_action: 
       - lambda: |-
-          id(modbus0)->send_enable(1);
-    turn_off_action:
+          if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN)) 
+            id(modbus0)->send_enable(0);
+    turn_on_action: 
       - lambda: |-
-          id(modbus0)->send_enable(0); 
+          if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN))
+            id(modbus0)->send_enable(1);
+          
