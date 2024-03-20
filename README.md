@@ -28,5 +28,5 @@ inside your ABL eMH1 Wallbox. There's also ~380V in that box, so
 please make sure you know what your doing. 
 
 This code was tested by trail and error, it might blow a fuse or two.
-Connecting this to your electricity network and your care is your own
+Connecting this to your electricity network and your car is your own
 responsibility.
