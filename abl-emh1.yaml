@@ -9,7 +9,7 @@ substitutions:
 esphome:
   name: ${name}
   comment: ${device_description}
-  friendly_name: ABL eMH1 Charger
+  friendly_name: ABL eMH1
   project:
     name: "jrv.esphome-abl-emh1"
     version: 0.0.1
@@ -64,7 +64,34 @@ text_sensor:
     serial_number:
       name: "Serial number"
       disabled_by_default: true
-
+  - platform: template
+    name: Chargemode
+    id: chargemode
+    icon: "mdi:car"
+    update_interval: 5s
+    disabled_by_default: true
+    lambda: |-
+      int phaseCnt = 0; 
+      if (id(outlet_state).state == 0xC2) {
+        if (id(l1_current).state > 1.0)
+          phaseCnt++;
+        if (id(l2_current).state > 1.0)
+          phaseCnt++;
+        if (id(l3_current).state > 1.0)
+          phaseCnt++;
+      }
+      std::__cxx11::string result;
+      switch (phaseCnt){
+        case 0: 
+          result = "None";
+          break;
+        case 1:
+          result = "1 Phase";
+          break;
+        default:
+          result = "3 Phase";
+      }
+      return result;
 
 sensor:
   - platform: abl_emh1
@@ -87,6 +114,7 @@ sensor:
       name: "Max current"
       state_class: "measurement"
       id: max_current
+      disabled_by_default: true 
       accuracy_decimals: 0
     en1_status:
       name: "EN1 status"
@@ -109,10 +137,9 @@ sensor:
     id: abl_uptime
     update_interval: 15s
 
-
 number:
   - platform: template
-    name: "Current"
+    name: "Max Amps"
     id: set_current
     icon: mdi:arrow-oscillating
     min_value: 3
@@ -140,4 +167,7 @@ switch:
       - lambda: |-
           if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN))
             id(modbus0)->send_enable(1);
+
+ 
+
           
