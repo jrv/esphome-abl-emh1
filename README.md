@@ -20,7 +20,7 @@ Some more output (like the serial number) is available in hidden entities.
 ### More info, questions
 
 Check out this thread on the Home Assistant community forum:
-https://community.home-assistant.io/t/modbus-ascii/633521
+https://community.home-assistant.io/t/connecting-the-abl-emh1-ev-charger-as-esphome-component
 
 ### Disclaimer
 Using this component requires you to connect consumer electronics
