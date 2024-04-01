@@ -26,6 +26,8 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
 	void set_duty_cycle_reduced_sensor(sensor::Sensor *duty_cycle_reduced_sensor) { duty_cycle_reduced_ = duty_cycle_reduced_sensor; }
 	void set_ucp_status_sensor(sensor::Sensor *ucp_status_sensor) { ucp_status_sensor_ = ucp_status_sensor; }
 	void set_outlet_state_sensor(sensor::Sensor *outlet_state_sensor) { outlet_state_sensor_ = outlet_state_sensor; }
+	void set_energy_total_sensor(sensor::Sensor *energy_total_sensor) { energy_total_sensor_ = energy_total_sensor; }
+	void set_energy_today_sensor(sensor::Sensor *energy_today_sensor) { energy_today_sensor_ = energy_today_sensor; }
 	void set_mode_text_sensor(text_sensor::TextSensor *mode_text_sensor) { mode_text_sensor_ = mode_text_sensor; }
   void set_serial_number_text_sensor(text_sensor::TextSensor *serial_number_text_sensor) { serial_number_text_sensor_ = serial_number_text_sensor; }
 
@@ -44,6 +46,8 @@ class ABLeMH1: public PollingComponent, public emh1_modbus::eMH1ModbusDevice {
   sensor::Sensor *duty_cycle_reduced_;
   sensor::Sensor *ucp_status_sensor_;
   sensor::Sensor *outlet_state_sensor_;
+	sensor::Sensor *energy_total_sensor_;
+	sensor::Sensor *energy_today_sensor_;
 
   text_sensor::TextSensor *mode_text_sensor_;
   text_sensor::TextSensor *serial_number_text_sensor_;
