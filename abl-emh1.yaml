@@ -80,7 +80,7 @@ text_sensor:
         if (id(l3_current).state > 1.0)
           phaseCnt++;
       }
-      std::__cxx11::string result;
+      std::string result;
       switch (phaseCnt){
         case 0: 
           result = "None";
