@@ -29,7 +29,8 @@ wifi:
   password: !secret wifi_password
 
 ota:
-  password: !secret ota_password
+  - platform: esphome
+    password: !secret ota_password
 
 logger:
   level: DEBUG
