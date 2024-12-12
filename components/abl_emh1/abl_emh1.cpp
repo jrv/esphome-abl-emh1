@@ -9,7 +9,7 @@ static const char *const TAG = "abl_emh1";
 static const uint8_t FUNCTION_STATUS_REPORT = 0x002E;
 static const uint8_t FUNCTION_GET_SERIAL = 0x0050;
 
-static const uint8_t STATE_SIZE = 13;
+static const uint8_t STATE_SIZE = 22;
 static const char *const STATE[STATE_SIZE] = {
 	"Waiting for EV",													// A1
 	"EV is asking for charging", 							// B1
@@ -23,11 +23,22 @@ static const char *const STATE[STATE_SIZE] = {
 	"Bus idle",																// E3
 	"Unintended closed contact (Welding)",		// F1
 	"Internal error",													// F2
-  "Unknown State code"											// default
+  "DC residual current detected",           // F3
+	"Upstream communication timeout",         // F4
+	"Lock of socket failed",                  // F5
+	"CS out of range",                        // F6
+	"State D requested by EV",                // F7
+	"CP out of range",                        // F8
+	"Overcurrent detected",                   // F9
+	"Temperature outside limits",             // FA
+	"Unintended opened contact",              // FB
+  "Unknown State code"                      // default
 };
 static const char STATECODE[STATE_SIZE] = {
   0xA1, 0xB1, 0xB2, 0xC2, 0xC3, 0xc4, 
-	0xE0, 0xE1, 0xE2, 0xE3, 0xF1, 0xF2, 0x00
+	0xE0, 0xE1, 0xE2, 0xE3, 0xF1, 0xF2,
+  0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8,
+  0xF9, 0xFA, 0xFB, 0x00
 };
 
 void ABLeMH1::on_emh1_modbus_data(uint16_t function, uint16_t datalength, const uint8_t* data) {
