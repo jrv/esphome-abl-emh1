@@ -68,7 +68,7 @@ text_sensor:
     update_interval: 5s
     disabled_by_default: true
     lambda: |-
-      int phaseCnt = 0; 
+      int phaseCnt = 0;
       if (id(outlet_state).state == 0xC2) {
         if (id(l1_current).state > 1.0)
           phaseCnt++;
@@ -91,36 +91,36 @@ sensor:
     l1_current:
       name: "L1 current"
       state_class: "measurement"
-      accuracy_decimals: 0
+      accuracy_decimals: 1
       id: l1_current
     l2_current:
       name: "L2 current"
       state_class: "measurement"
-      accuracy_decimals: 0
+      accuracy_decimals: 1
       id: l2_current
     l3_current:
       name: "L3 current"
       state_class: "measurement"
-      accuracy_decimals: 0
+      accuracy_decimals: 1
       id: l3_current
     max_current:
       name: "Max current"
       state_class: "measurement"
       id: max_current
-      disabled_by_default: true 
-      accuracy_decimals: 0
+      disabled_by_default: true
+      accuracy_decimals: 1
     en1_status:
       name: "EN1 status"
-      disabled_by_default: true 
+      disabled_by_default: true
     en2_status:
       name: "EN2 status"
-      disabled_by_default: true 
+      disabled_by_default: true
     duty_cycle_reduced:
       name: "Reduced Duty Cycle (max_current)"
-      disabled_by_default: true 
+      disabled_by_default: true
     ucp_status:
       name: "Ucp Status <= 10V"
-      disabled_by_default: true 
+      disabled_by_default: true
     outlet_state:
       name: "Outlet state"
       disabled_by_default: true
@@ -141,14 +141,14 @@ number:
     icon: mdi:arrow-oscillating
     min_value: 6
     max_value: 32
-    step: 1
+    step: 0.1
     optimistic: false
     lambda: 'return std::lround(id(max_current).state);'
     update_interval: 10s
     set_action:
       lambda: |-
-        ESP_LOGD("main", "Sending modbus value = %d", std::lround(x));
-        id(modbus0)->send_current(std::lround(x));
+        ESP_LOGD("main", "Sending modbus value = %.2f", x);
+        id(modbus0)->send_current(x);
 
 switch:
   - platform: template
@@ -156,18 +156,19 @@ switch:
     id: enable_switch
     icon: "mdi:power"
     lambda: 'return (id(outlet_state).state != 0xE0);'
-    turn_off_action: 
+    turn_off_action:
       - lambda: |-
-          if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN)) 
+          if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN))
             id(modbus0)->send_enable(0);
-    turn_on_action: 
+    turn_on_action:
       - lambda: |-
           if ((id(abl_uptime).state > 10.0) && (id(outlet_state).state != NAN))
             id(modbus0)->send_enable(1);
   - platform: template
-    name: "Allow chaging"
+    name: "Allow charging"
     id: allow_charging_switch
     icon: "mdi:power"
+    restore_mode: DISABLED
     lambda: 'return id(charging_allowed).state == 1;'
     turn_on_action:
       - lambda: |-
