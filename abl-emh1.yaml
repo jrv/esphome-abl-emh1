@@ -15,6 +15,10 @@ esphome:
   project:
     name: "jrv.esphome-abl-emh1"
     version: 0.0.1
+  on_boot:
+    - number.set:
+        id: set_current
+        value: 16
 
 esp32:
   board: esp32dev
