@@ -1,10 +1,12 @@
 substitutions:
   name: abl_emh1
   device_description: "Monitor and configure ABL eMH1 Charger via RS485/Modbus-ASCII"
-  external_components_source: github://pascal-t/esphome-abl-emh1@no-current-allowed
+  external_components_source: github://jrv/esphome-abl-emh1@main
   tx_pin: "17"
   rx_pin: "16"
   flow_control_pin: "5"
+  wallbox_min_current: "0"
+  wallbox_max_current: "32"
 
 esphome:
   name: ${name}
@@ -139,8 +141,8 @@ number:
     name: "Max Amps"
     id: set_current
     icon: mdi:arrow-oscillating
-    min_value: 6
-    max_value: 32
+    min_value: ${wallbox_min_current}
+    max_value: ${wallbox_max_current}
     step: 0.1
     optimistic: false
     lambda: 'return std::lround(id(max_current).state);'
@@ -155,6 +157,7 @@ switch:
     name: "Enable"
     id: enable_switch
     icon: "mdi:power"
+    restore_mode: DISABLED
     lambda: 'return (id(outlet_state).state != 0xE0);'
     turn_off_action:
       - lambda: |-
@@ -175,7 +178,7 @@ switch:
           if (id(outlet_state).state == NAN) return;
           int state = std::roundl(id(charging_allowed).state);
           ESP_LOGD("main", "Allow charging turn on. Current state is: %d", state);
-          if (state <= 0) id(modbus0)->send_current(16);
+          if (state <= 0) id(modbus0)->send_current(${wallbox_max_current});
     turn_off_action:
       - lambda: |-
           if (id(outlet_state).state == NAN) return;
