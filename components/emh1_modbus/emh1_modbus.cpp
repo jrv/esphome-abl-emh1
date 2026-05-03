@@ -2,7 +2,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 #include "esphome.h"
-#include <cstdint>
 
 namespace esphome {
 namespace emh1_modbus {
@@ -28,7 +27,10 @@ void eMH1Modbus::setup() {
 void eMH1Modbus::loop() {
   const uint32_t now = millis();
   if (now - this->last_emh1_modbus_byte_ > 50) {
-    this->rx_buffer_.clear();
+    if (!this->rx_buffer_.empty()) {
+      ESP_LOGW(TAG, "Transmission interrupted. Discarding buffer.");
+      this->rx_buffer_.clear();
+    }
     this->last_emh1_modbus_byte_ = now;
   }
 
